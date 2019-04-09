@@ -23,6 +23,12 @@ public class Terme {
 		this.setDerivate(new ArrayList<String>());
 	}
 	
+	public Terme(String name) {
+		this.name = name;
+		this.setAssociation(new ArrayList<Concept>());
+		this.setDerivate(new ArrayList<String>());
+	}
+	
 	//Getters / Setters
 	public String getName() {
 		return name;
