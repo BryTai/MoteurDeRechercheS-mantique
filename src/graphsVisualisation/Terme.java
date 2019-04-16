@@ -13,8 +13,10 @@ public class Terme {
 	private String langue;
 	private ArrayList<String> notes;
 	private String context;
+	private String[] concepts;
 	private ArrayList<String> derivate;
 	private ArrayList<Concept> association;
+	
 	
 	//Constructeurs
 	public Terme() {
@@ -23,31 +25,23 @@ public class Terme {
 		this.setDerivate(new ArrayList<String>());
 	}
 	
-	public Terme(String name) {
-		this.name = name;
-		this.setAssociation(new ArrayList<Concept>());
-		this.setDerivate(new ArrayList<String>());
-	}
-	
 	//Getters / Setters
+	
+
+	//@override
+	
+	public String getLangue() {
+		return langue;
+	}
+
 	public String getName() {
 		return name;
 	}
-	public void setName(String nom) {
-		this.name = nom;
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	public ArrayList<String> getDerivate() {
-		return derivate;
-	}
-	public void setDerivate(ArrayList<String> derivate) {
-		this.derivate = derivate;
-	}
-	public ArrayList<Concept> getAssociation() {
-		return association;
-	}
-	public void setAssociation(ArrayList<Concept> association) {
-		this.association = association;
-	}
+
 	public String getStatus() {
 		return status;
 	}
@@ -79,7 +73,7 @@ public class Terme {
 	public void setNotes(ArrayList<String> notes) {
 		this.notes = notes;
 	}
-	
+
 	public String getContext() {
 		return context;
 	}
@@ -88,10 +82,28 @@ public class Terme {
 		this.context = context;
 	}
 
-	//@override
-	
-	public String getLangue() {
-		return langue;
+	public String[] getConcepts() {
+		return concepts;
+	}
+
+	public void setConcepts(String[] concepts) {
+		this.concepts = concepts;
+	}
+
+	public ArrayList<String> getDerivate() {
+		return derivate;
+	}
+
+	public void setDerivate(ArrayList<String> derivate) {
+		this.derivate = derivate;
+	}
+
+	public ArrayList<Concept> getAssociation() {
+		return association;
+	}
+
+	public void setAssociation(ArrayList<Concept> association) {
+		this.association = association;
 	}
 
 	public void setLangue(String langue) {
