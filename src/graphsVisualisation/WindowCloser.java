@@ -55,8 +55,8 @@ public class WindowCloser implements WindowListener {
      * quit() is a method to "easily" quit the main frame, remove the icon tray and exiting the program
      */
     protected void quit() {
-        main_frame.getSystemTray().remove(main_frame.getMainTrayIcon());
-        main_frame.getOptionsManager().saveOptions();
+        //main_frame.getSystemTray().remove(main_frame.getMainTrayIcon());
+        //main_frame.getOptionsManager().saveOptions();
         main_frame.dispose();
         System.exit(0);
     }

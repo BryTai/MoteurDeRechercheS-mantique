@@ -2,6 +2,9 @@ package graphsVisualisation;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
 /**
  * The class SearchManager is a class that manages the interactions between the search bar, the search button
@@ -30,6 +33,12 @@ public class SearchManager implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		search_bar_content = main_frame.getSearchBarText();
+		try {
+			Indexation.searchIndex(search_bar_content);
+		} catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println(search_bar_content);
 	}
 }

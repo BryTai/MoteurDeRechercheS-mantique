@@ -3,6 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="ressources/gson-2.2.2.jar"/>
 	<classpathentry kind="lib" path="ressources/jgrapht-core-1.3.0.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_201"/>
+	<classpathentry kind="lib" path="C:/Users/devil/Desktop/Librairie Java Projet/pdfbox-2.0.14.jar"/>
+	<classpathentry kind="lib" path="C:/Users/devil/Desktop/Librairie Java Projet/pdfbox-app-2.0.14.jar"/>
+	<classpathentry kind="lib" path="C:/Users/devil/Desktop/lucene-2.9.4/lucene-core-2.9.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

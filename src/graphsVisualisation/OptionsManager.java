@@ -130,7 +130,7 @@ public class OptionsManager {
 	 * the animation title
 	 * @return boolean : The state of the option
 	 */
-	public boolean isTitleAnimationEnabled() {
+	protected boolean isTitleAnimationEnabled() {
 		return title_animation_enabled;
 	}
 

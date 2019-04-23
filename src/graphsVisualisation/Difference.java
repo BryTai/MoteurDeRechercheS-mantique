@@ -4,6 +4,7 @@ public class Difference {
 	//Attributs
 	private String name;
 	private String internationalName;
+	private String id;
 	
 	//Constructeur 
 	
@@ -34,8 +35,16 @@ public class Difference {
 		this.internationalName = newName;
 	}
 	
-	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	//@Ovveride
+	
 	
 	public String toString() {
 		String res = new String();
