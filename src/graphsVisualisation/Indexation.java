@@ -52,7 +52,7 @@ public class Indexation {
     @SuppressWarnings("deprecation")
    public static void searchIndex(String searchString) throws IOException, ParseException{
        System.out.println("Rechercher : '" + searchString + "'");
-       Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY);
+       Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY); 
        IndexReader indexReader = IndexReader.open(directory);
        IndexSearcher indexSearcher= new IndexSearcher(indexReader);
 

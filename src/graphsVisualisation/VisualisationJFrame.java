@@ -322,7 +322,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.terms_panel = new JPanel();
 	this.terms_label = new JLabel(TERMS_LABEL_NAME);
 	this.term_list_model = new DefaultListModel<String>();
-	this.addTerms();
+	//this.addTerms();
 	this.term_list = new JList<String>(term_list_model);
 	this.terms_view = new JScrollPane(term_list);
 
@@ -469,10 +469,19 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     /**
      * addTerms permits to add all the terms into the list model
      */
-    private void addTerms() {
-    	for(int i=0; i<30; i++) {
-    		this.term_list_model.addElement("- Terme " + Integer.toString(i));
-    	}
+    private void addTerms(String conceptID) {
+    	term_list_model.clear();
+    	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
+        HashMap<String,ArrayList<String>> cpt_term = parser.cpt_trm();
+        HashMap<String, Concept> cpt = parser.lesConcepts(); 
+        HashMap<String, Terme> term = parser.lesTermes(cpt);
+        ArrayList<String> lesTermes = cpt_term.get(conceptID);
+        for (int i = 0 ; i < lesTermes.size();i++) {
+            if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
+            	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
+            }
+        }
+    	
 	}
 
 	/**
@@ -537,8 +546,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	    public void valueChanged(TreeSelectionEvent arg0) {
 	    	DefaultMutableTreeNode node = (DefaultMutableTreeNode) concepts_tree.getLastSelectedPathComponent();
 	    	Concept cpt = (Concept) node.getUserObject();
-	    	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
-	    	HashMap<String, ArrayList<String>> cpt_trm = parser.cpt_trm();
+	    	addTerms(cpt.getId());
 	    }
 	});
 
