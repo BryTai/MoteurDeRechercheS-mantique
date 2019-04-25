@@ -7,21 +7,16 @@ import java.util.Map.Entry;
 public class ParserOnto {
 	
 	// Attributs
-	
 	//Le chemin d'accès au Json
 	private String path; 
-	
 	private JsonParser parser;
-	
 	private Object obj;
-	
 	private JsonObject jsonObj;
-	
 	private Gson myGson;
-	
+
 	//Constructeur
 	public ParserOnto() {
-		this.setPath("");
+		this.path = "";
 		this.setMyGson(new Gson());
 	}
 	
@@ -66,7 +61,6 @@ public class ParserOnto {
 //*************************************************************************************************************************
 
 	//@Override
-	
 	public String toString() {
 		String res = new String();
 		res = res + "Path : " + this.getPath() +" \n";
@@ -76,12 +70,10 @@ public class ParserOnto {
 	
 	
 	//Méthode de parsing
-	
-	
 //*************************************************************************************************************************
 
 	//Parsing des concepts dans un dictionnaire avec les clés correspondant au id des concepts et la value l'objet java correspondant
-	public HashMap<String, Concept> lesConcepts(){
+	protected HashMap<String, Concept> lesConcepts(){
 		//Le dictionnaire qui contiendra les concepts
 		HashMap<String, Concept> dicoConcept = new HashMap<String, Concept>();
 		
@@ -127,7 +119,7 @@ public class ParserOnto {
 //*************************************************************************************************************************
 	
 	//Parsing des terme dans un dictionnaire avec comme clé les id des termes et en value l'objet correspondant
-	public HashMap<String, Terme> lesTermes(HashMap<String, Concept> dicoCPT){
+	private HashMap<String, Terme> lesTermes(HashMap<String, Concept> dicoCPT){
 		//Le dictionnaire final
 		HashMap<String, Terme> dicoTerme = new HashMap<String, Terme>();
 		//Récupération de la langue
@@ -154,7 +146,7 @@ public class ParserOnto {
 	
 //*************************************************************************************************************************
 	//Création de la liaison entre concept et terme
-	public HashMap<String,ArrayList<String> > cpt_trm(){
+	protected HashMap<String,ArrayList<String> > cpt_trm(){
 		HashMap<String, ArrayList<String>>cpt_term = new HashMap<String,ArrayList<String>>();
 		HashMap<String, Concept>cpt = this.lesConcepts();
 		HashMap<String, Terme>trm = this.lesTermes(cpt);

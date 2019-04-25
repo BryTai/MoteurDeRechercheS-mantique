@@ -77,6 +77,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
     // JMenuItems
     private JMenuItem menu_item_quit;
+    private JMenuItem menu_item_upload;
     private JMenuItem menu_item_clear;
     private JMenuItem menu_item_help;
 
@@ -108,7 +109,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     // JList
     private JList<String> term_list;
     
-    // DefaultListModel
+    // DefaultList
     private DefaultListModel<String> term_list_model;
     
     // Dimensions
@@ -167,6 +168,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
     // Constants for the names of the items of the menus
     private final String QUIT_OPTION_NAME = "Quitter";
+    private final String MENU_ITEM_UPLOAD = "Upload";
     private final String CLEAR_OPTION_NAME = "Nettoyer la recherche";
     private final String TITLE_ANIMATION_OPTION_NAME = "Animation du titre";
     private final String HELP_OPTION_NAME = "Documentation";
@@ -296,6 +298,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.menu_help = new JMenu(MENU_HELP_NAME);
 
 	this.menu_item_quit = new JMenuItem(QUIT_OPTION_NAME);
+	this.menu_item_upload = new JMenuItem(MENU_ITEM_UPLOAD);
 	this.menu_item_clear = new JMenuItem(CLEAR_OPTION_NAME);
 	this.menu_item_title_animation = new JCheckBoxMenuItem(TITLE_ANIMATION_OPTION_NAME);
 	this.menu_item_help = new JMenuItem(HELP_OPTION_NAME);
@@ -398,7 +401,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
 	// Adding items to the menus of the menubar
 	menu_file.add(menu_item_quit);
-	// menu_edit.add(menu_item_default);
+	menu_edit.add(menu_item_upload);
 	menu_edit.add(menu_item_clear);
 	menu_options.add(menu_item_title_animation);
 	menu_help.add(menu_item_help);
@@ -479,80 +482,87 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * addListeners() permits to add all the listeners for the interface
      */
     private void addListeners() {
-	// Adding a listener to quit the interface
-	menu_item_quit.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent evt) {
-	    	// Disposing the frame and exiting the program
-	    	main_window_closer.quit();
-	    }
-	});
+    	//Adding a listener to open the upload interface
+    	menu_item_upload.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			new UploadJFrame();
+    		}
+    	});
+    	
+    	// Adding a listener to quit the interface
+    	menu_item_quit.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent evt) {
+    			// Disposing the frame and exiting the program
+    			main_window_closer.quit();
+    		}
+    	});
 
-	//Adding a listener to get the last selected element in the list of terms
-	term_list.addListSelectionListener(new ListSelectionListener() {
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			if(!e.getValueIsAdjusting()) {
-				System.out.println(main_frame.term_list.getSelectedValue().toString());
-			}
-		}
-	});
+    	//Adding a listener to get the last selected element in the list of terms
+    	term_list.addListSelectionListener(new ListSelectionListener() {
+    		@Override
+    		public void valueChanged(ListSelectionEvent e) {
+    			if(!e.getValueIsAdjusting()) {
+    				//System.out.println(main_frame.term_list.getSelectedValue().toString());
+    			}
+    		}
+    	});
 	
-	// Adding a listener to change the value of the state of the title animation
-	menu_item_title_animation.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent arg0) {
-	    	options_manager.setTitleAnimationEnabled(menu_item_title_animation.isSelected());
-	    }
-	});
+    	// Adding a listener to change the value of the state of the title animation
+    	menu_item_title_animation.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent arg0) {
+    			options_manager.setTitleAnimationEnabled(menu_item_title_animation.isSelected());
+    		}
+    	});
 
-	// Adding a listener to display the documentation
-	menu_item_help.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent evt) {
-	    	// Opening the "Help" dialog
-	    	new HelpDialog(main_frame);
-	    }
-	});
+    	// Adding a listener to display the documentation
+    	menu_item_help.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent evt) {
+    			//Opening the "Help" dialog
+    			new HelpDialog(main_frame);
+    		}
+    	});
 
-	// Adding actions to the search bar
-	search_button.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent evt) {
-	    	search_manager.actionPerformed(evt);
-	    }
-	});
+    	//Adding actions to the search bar
+    	search_button.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent evt) {
+    			search_manager.actionPerformed(evt);
+    		}
+    	});
 
-	// Adding a listener to clear the search bar
-	menu_item_clear.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-	    	main_frame.clearSearchBarText();
-	    }
-	});
+    	// Adding a listener to clear the search bar
+    	menu_item_clear.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			main_frame.clearSearchBarText();
+    		}
+    	});
 
-	// Adding a listener to detect the concept clicked
-	concepts_tree.addTreeSelectionListener(new TreeSelectionListener() {
-	    @Override
-	    public void valueChanged(TreeSelectionEvent arg0) {
-	    	DefaultMutableTreeNode node = (DefaultMutableTreeNode) concepts_tree.getLastSelectedPathComponent();
-	    	Concept cpt = (Concept) node.getUserObject();
-	    	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
-	    	HashMap<String, ArrayList<String>> cpt_trm = parser.cpt_trm();
-	    }
-	});
+    	// Adding a listener to detect the concept clicked
+    	concepts_tree.addTreeSelectionListener(new TreeSelectionListener() {
+    		@Override
+    		public void valueChanged(TreeSelectionEvent arg0) {
+    			DefaultMutableTreeNode node = (DefaultMutableTreeNode) concepts_tree.getLastSelectedPathComponent();
+    			Concept cpt = (Concept) node.getUserObject();
+    			ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
+    			HashMap<String, ArrayList<String>> cpt_trm = parser.cpt_trm();
+    		}
+    	});
 
-	// Adding a listener to manage the state of the checkbox in the class
-	// OptionsManager
-	this.menu_item_title_animation.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		boolean is_selected = main_frame.menu_item_title_animation.isSelected();
-		main_frame.options_manager.setTitleAnimationEnabled(is_selected);
-	    }
-	});
+    	//Adding a listener to manage the state of the checkbox in the class OptionsManager
+    	menu_item_title_animation.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			boolean is_selected = main_frame.menu_item_title_animation.isSelected();
+    			main_frame.options_manager.setTitleAnimationEnabled(is_selected);
+    		}
+    	});
 
-	this.addWindowListener(main_window_closer);
+    	this.addWindowListener(main_window_closer);
     }
 
     /**
@@ -599,44 +609,44 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * system tray
      */
     private void addTrayIconAndMenu() {
-	// If there is a system tray, adding the menu and the tray icons
-	if (SystemTray.isSupported()) {
-	    // Initialize elements of the system tray
-	    system_tray = SystemTray.getSystemTray(); // Getting the system tray
-	    main_tray_icon = new TrayIcon(main_icon.getImage());
-	    main_popup = new PopupMenu();
-	    tray_menu_item_quit = new MenuItem(QUIT_OPTION_NAME);
+    	// If there is a system tray, adding the menu and the tray icons
+    	if (SystemTray.isSupported()) {
+    		// Initialize elements of the system tray
+    		system_tray = SystemTray.getSystemTray(); // Getting the system tray
+    		main_tray_icon = new TrayIcon(main_icon.getImage());
+    		main_popup = new PopupMenu();
+    		tray_menu_item_quit = new MenuItem(QUIT_OPTION_NAME);
 
-	    // Adding actions to the menu items
-	    tray_menu_item_quit.addActionListener(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent evt) {
-		    // Disposing the frame and exiting the program
-		    main_window_closer.quit();
-		}
-	    });
+    		//Adding actions to the menu items
+    		tray_menu_item_quit.addActionListener(new ActionListener() {
+    			@Override
+    			public void actionPerformed(ActionEvent evt) {
+    				// Disposing the frame and exiting the program
+    				main_window_closer.quit();
+    			}
+    		});
 
-	    // Adding items to the menu
-	    main_popup.add(tray_menu_item_quit);
+    		// Adding items to the menu
+    		main_popup.add(tray_menu_item_quit);
 
-	    // Setting the popup menu of the tray icon
-	    main_tray_icon.setPopupMenu(main_popup);
-	    main_tray_icon.setImageAutoSize(true);
+    		// Setting the popup menu of the tray icon
+    		main_tray_icon.setPopupMenu(main_popup);
+    		main_tray_icon.setImageAutoSize(true);
 
-	    // Adding the tray icon to the system tray
-	    try {
-	    	system_tray.add(main_tray_icon);
-	    } catch (AWTException e) {
-	    	System.err.println(TRAY_ICON_ADDING_ERROR);
-	    }
-	}
+    		// Adding the tray icon to the system tray
+    		try {
+    			system_tray.add(main_tray_icon);
+    		} catch (AWTException e) {
+    			System.err.println(TRAY_ICON_ADDING_ERROR);
+    		}
+    	}
     }
 
     /**
      * getMainFrame() is a getter to access to the main frame
      * @return VisualisationJFrame : An instance of the main frame
      */
-    public VisualisationJFrame getMainFrame() {
+    protected VisualisationJFrame getMainFrame() {
     	return main_frame;
     }
 
@@ -644,7 +654,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * getMainTrayIcon() is a getter to access to the main tray icon
      * @return TrayIcon : This getter returns the main tray icon
      */
-    public TrayIcon getMainTrayIcon() {
+    protected TrayIcon getMainTrayIcon() {
     	return main_tray_icon;
     }
 
@@ -652,7 +662,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * getSystemTray() is a getter to access to the system tray
      * @return SystemTray : This getter returns the system tray
      */
-    public SystemTray getSystemTray() {
+    protected SystemTray getSystemTray() {
     	return system_tray;
     }
 
@@ -660,15 +670,15 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * getSearchBarText() is a getter to access to the content of the search_bar 
      * @return String : This getter returns the content of the search bar
      */
-    public String getSearchBarText() {
+    protected String getSearchBarText() {
     	return this.search_bar.getText();
     }
 
     /**
      * clearSearchBarText() is a method to clear the content of the search bar
      */
-    public void clearSearchBarText() {
-	this.search_bar.setText("");
+    protected void clearSearchBarText() {
+    	this.search_bar.setText("");
     }
 
     /**
@@ -677,8 +687,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * 
      * @return JLabel : This getter returns the title label
      */
-    public JLabel getTitleLabel() {
-	return title_label;
+    protected JLabel getTitleLabel() {
+    	return title_label;
     }
 
     /**
@@ -687,8 +697,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * 
      * @return int : This getter returns the y position of the label
      */
-    public int getTitleLabelY() {
-	return title_label.getY();
+    protected int getTitleLabelY() {
+    	return title_label.getY();
     }
 
     /**
@@ -697,8 +707,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * 
      * @return int : This getter returns the x position of the label
      */
-    public int getTitleLabelX() {
-	return title_label.getX();
+    protected int getTitleLabelX() {
+    	return title_label.getX();
     }
 
     /**
@@ -708,8 +718,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * @return TitleLabelApparitionEffect : This getter returns the instance of
      *         the class that manages the effect of the title label
      */
-    public TitleLabelApparitionEffect getTitleLabelEffect() {
-	return title_label_effect;
+    protected TitleLabelApparitionEffect getTitleLabelEffect() {
+    	return title_label_effect;
     }
 
     /**
@@ -720,17 +730,17 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      *         options of the interface
      */
     protected OptionsManager getOptionsManager() {
-	return options_manager;
+    	return options_manager;
     }
 
     /**
      * setTitleAnimationState is a setter that permits to change the state of
      * the checkbox for the animation of the title label
      * 
-     * @param boolean : The state of the checkbox
+     * @param b: The state of the checkbox (boolean)
      */
     protected void setTitleAnimationState(boolean b) {
-	this.menu_item_title_animation.setSelected(b);
+    	this.menu_item_title_animation.setSelected(b);
     }
 
     /**
