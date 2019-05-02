@@ -1,5 +1,13 @@
 package graphsVisualisation;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.util.Iterator;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -22,6 +30,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import java.io.*;
 import java.util.Iterator;
 
+@SuppressWarnings("deprecation")
 public class Indexation {
 	private static final String FILES_TO_INDEX_DIRECTORY = "ressources/fileToIndex";
     private static final String INDEX_DIRECTORY = "ressources/indexDirectory";
@@ -29,12 +38,12 @@ public class Indexation {
     private static final String FIELD_CONTENTS = "contents";
 
     @SuppressWarnings("deprecation")
-   public static void createIndex() throws CorruptIndexException, LockObtainFailedException,IOException{
-       Analyzer analyzer = new StandardAnalyzer();
-       boolean recreatedIndexIfExists = true;
-       IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
-       File dir = new File(FILES_TO_INDEX_DIRECTORY);
-       File[] files = dir.listFiles();
+    public static void createIndex() throws CorruptIndexException, LockObtainFailedException,IOException{
+        Analyzer analyzer = new StandardAnalyzer();
+        boolean recreatedIndexIfExists = true;
+        IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
+        File dir = new File(FILES_TO_INDEX_DIRECTORY);
+        File[] files = dir.listFiles();
         if (files != null) {
             for(File file : files){
                 Document document = new Document();
@@ -46,33 +55,31 @@ public class Indexation {
             }
         }
         indexWriter.optimize();
-       indexWriter.close();
-   }
+        indexWriter.close();
+    }
 
     @SuppressWarnings("deprecation")
-   public static void searchIndex(String searchString) throws IOException, ParseException{
-       System.out.println("Rechercher : '" + searchString + "'");
-       Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY); 
-       IndexReader indexReader = IndexReader.open(directory);
-       IndexSearcher indexSearcher= new IndexSearcher(indexReader);
+    public static void searchIndex(String searchString) throws IOException, ParseException{
+        System.out.println("Rechercher : '" + searchString + "'");
+        Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY); 
+        IndexReader indexReader = IndexReader.open(directory);
+        IndexSearcher indexSearcher= new IndexSearcher(indexReader);
 
-       Analyzer analyzer = new StandardAnalyzer();
-       QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
-       Query query = queryParser.parse(searchString);
-       Hits hits = indexSearcher.search(query);
-       System.out.println("Number of hits: " + hits.length());
-       Iterator<Hit> it = hits.iterator();
-       while(it.hasNext()){
-           Hit hit = it.next();
-           Document document = hit.getDocument();
-           String path = document.get(FIELD_PATH);
-           System.out.println("Hit : " + path);
-       }
+        Analyzer analyzer = new StandardAnalyzer();
+        QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
+        Query query = queryParser.parse(searchString);
+        Hits hits = indexSearcher.search(query);
+        System.out.println("Number of hits: " + hits.length());
+        Iterator<Hit> it = hits.iterator();
+        while(it.hasNext()){
+            Hit hit = it.next();
+            Document document = hit.getDocument();
+            String path = document.get(FIELD_PATH);
+            System.out.println("Hit : " + path);
+        }
+    }
 
-
-   }
-
-   public static void pdfToText(String docName){
+    public static void pdfToText(String docName){
         File f = new File(FILES_TO_INDEX_DIRECTORY+ "/" + docName+".txt");
         if (f.exists()){
             System.out.println("Le fichier existe déjà!!!");

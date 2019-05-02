@@ -33,6 +33,7 @@ public class OptionsManager {
 	
 	/**
 	 * OptionsManager() is the main constructor of this class.
+	 * @param f: The main interface
 	 */
 	public OptionsManager(VisualisationJFrame f) {
 		this.main_frame = f;
@@ -137,7 +138,7 @@ public class OptionsManager {
 	/**
 	 * setTitleAnimationEnabled is a setter to set the state of the option for
 	 * the animation title
-	 * @param boolean : The state of the option
+	 * @param is_enabled : The state of the option
 	 */
 	protected void setTitleAnimationEnabled(boolean is_enabled) {
 		this.title_animation_enabled = is_enabled;
