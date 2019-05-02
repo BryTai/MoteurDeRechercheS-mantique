@@ -446,7 +446,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
 		// Adding elements to the documents panel
 		documents_panel.add(documents_label, results_panel_gbc);
-		documents_panel.add(documents_view);
+		documents_panel.add(documents_view, results_panel_gbc);
 
 		// Adding elements to the title panel
 		title_panel.add(title_label);

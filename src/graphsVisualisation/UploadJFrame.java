@@ -76,8 +76,8 @@ public class UploadJFrame extends JFrame {
     private final short DOCUMENTS_VIEW_Y = DOCUMENTS_PANEL_Y-11;
     
     //Constants for the layouts
-    private final byte OPTIONS_PANEL_LAYOUT_COL = 1;
-    private final byte OPTIONS_PANEL_LAYOUT_ROW = 2;
+    private final byte OPTIONS_PANEL_LAYOUT_COL = 2;
+    private final byte OPTIONS_PANEL_LAYOUT_ROW = 1;
     
     //Constants for the file chooser
     private final boolean CAN_SELECT_MULTIPLE_DOCUMENTS = false;
