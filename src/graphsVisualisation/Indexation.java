@@ -27,8 +27,6 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-import java.io.*;
-import java.util.Iterator;
 
 @SuppressWarnings("deprecation")
 public class Indexation {
@@ -37,7 +35,7 @@ public class Indexation {
     private static final String FIELD_PATH = "path";
     private static final String FIELD_CONTENTS = "contents";
 
-    @SuppressWarnings("deprecation")
+
     public static void createIndex() throws CorruptIndexException, LockObtainFailedException,IOException{
         Analyzer analyzer = new StandardAnalyzer();
         boolean recreatedIndexIfExists = true;
@@ -58,7 +56,7 @@ public class Indexation {
         indexWriter.close();
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings("unchecked")
     public static void searchIndex(String searchString) throws IOException, ParseException{
         System.out.println("Rechercher : '" + searchString + "'");
         Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY); 
