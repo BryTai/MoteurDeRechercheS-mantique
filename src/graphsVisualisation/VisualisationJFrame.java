@@ -105,11 +105,12 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
     // Font
     private Font title_font;
+    private Font list_elements_font;
 
     // JList
     private JList<String> term_list;
     
-    // DefaultList
+    // DefaultListModel
     private DefaultListModel<String> term_list_model;
     
     // Dimensions
@@ -168,11 +169,10 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
     // Constants for the names of the items of the menus
     private final String QUIT_OPTION_NAME = "Quitter";
-    private final String MENU_ITEM_UPLOAD = "Upload";
+    private final String UPLOAD_OPTION_NAME = "Upload de documents";
     private final String CLEAR_OPTION_NAME = "Nettoyer la recherche";
     private final String TITLE_ANIMATION_OPTION_NAME = "Animation du titre";
     private final String HELP_OPTION_NAME = "Documentation";
-    private final String DEFAULT_OPTION_NAME = "???";
 
     // Constants for the name of the elements of the main panel
     private final String SEARCH_BAR_CONTENT = "";
@@ -253,8 +253,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
     // Constant for the "title label"
     private final String TITLE_NAME = "Moteur de Recherche Sémantique";
-    private final byte TITLE_SIZE = 25;
+    private final byte TITLE_LABEL_SIZE = 25;
 
+    //Constants for the font of the elements in lists/trees
+    private final byte ELEMENTS_FONT_SIZE = 12;
+    
     // Constants for the labels in results_panel
     private final String ROOT_NODE_NAME = "Liste des concepts";
     private final String TERMS_LABEL_NAME = "Liste des termes";
@@ -273,7 +276,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.main_frame = this;
 
 	// Initialize font
-	this.title_font = new Font(TITLE_FONT, Font.PLAIN, TITLE_SIZE);
+	this.title_font = new Font(TITLE_FONT, Font.PLAIN, TITLE_LABEL_SIZE);
+	this.list_elements_font = new Font(TITLE_FONT, Font.PLAIN, ELEMENTS_FONT_SIZE);
 
 	// Initialize dimensions
 	this.search_panel_dimension = new Dimension(SEARCH_PANEL_X, SEARCH_PANEL_Y);
@@ -298,7 +302,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.menu_help = new JMenu(MENU_HELP_NAME);
 
 	this.menu_item_quit = new JMenuItem(QUIT_OPTION_NAME);
-	this.menu_item_upload = new JMenuItem(MENU_ITEM_UPLOAD);
+	this.menu_item_upload = new JMenuItem(UPLOAD_OPTION_NAME);
 	this.menu_item_clear = new JMenuItem(CLEAR_OPTION_NAME);
 	this.menu_item_title_animation = new JCheckBoxMenuItem(TITLE_ANIMATION_OPTION_NAME);
 	this.menu_item_help = new JMenuItem(HELP_OPTION_NAME);
@@ -325,7 +329,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.terms_panel = new JPanel();
 	this.terms_label = new JLabel(TERMS_LABEL_NAME);
 	this.term_list_model = new DefaultListModel<String>();
-	this.addTerms();
+	//this.addTerms();
 	this.term_list = new JList<String>(term_list_model);
 	this.terms_view = new JScrollPane(term_list);
 
@@ -381,6 +385,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	concepts_panel.setPreferredSize(concepts_panel_dimension);
 	concepts_panel.setBorder(concepts_panel_border);
 
+	concepts_tree_view.setFont(list_elements_font);
 	concepts_tree_view.setPreferredSize(concepts_tree_dimension);
 
 	terms_panel.setPreferredSize(terms_panel_dimension);
@@ -472,97 +477,108 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     /**
      * addTerms permits to add all the terms into the list model
      */
-    private void addTerms() {
-    	for(int i=0; i<30; i++) {
-    		this.term_list_model.addElement("- Terme " + Integer.toString(i));
-    	}
+    private void addTerms(String conceptID) {
+    	term_list_model.clear();
+    	
+    	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
+        HashMap<String,ArrayList<String>> cpt_term = parser.cpt_trm();
+        HashMap<String, Concept> cpt = parser.lesConcepts(); 
+        HashMap<String, Terme> term = parser.lesTermes(cpt);
+        ArrayList<String> lesTermes = cpt_term.get(conceptID);
+        
+        for (int i = 0 ; i < lesTermes.size();i++) {
+        	if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
+	           	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
+	        }
+	    }            	
 	}
 
 	/**
      * addListeners() permits to add all the listeners for the interface
      */
     private void addListeners() {
-    	//Adding a listener to open the upload interface
-    	menu_item_upload.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent e) {
-    			new UploadJFrame();
-    		}
-    	});
-    	
-    	// Adding a listener to quit the interface
-    	menu_item_quit.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent evt) {
-    			// Disposing the frame and exiting the program
-    			main_window_closer.quit();
-    		}
-    	});
+	// Adding a listener to quit the interface
+	menu_item_quit.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent evt) {
+	    	// Disposing the frame and exiting the program
+	    	main_window_closer.quit();
+	    }
+	});
 
-    	//Adding a listener to get the last selected element in the list of terms
-    	term_list.addListSelectionListener(new ListSelectionListener() {
-    		@Override
-    		public void valueChanged(ListSelectionEvent e) {
-    			if(!e.getValueIsAdjusting()) {
-    				//System.out.println(main_frame.term_list.getSelectedValue().toString());
-    			}
-    		}
-    	});
+	//Adding a listener to get the last selected element in the list of terms
+	term_list.addListSelectionListener(new ListSelectionListener() {
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			if(!e.getValueIsAdjusting()) {
+				//System.out.println(main_frame.term_list.getSelectedValue().toString());
+			}
+		}
+	});
 	
-    	// Adding a listener to change the value of the state of the title animation
-    	menu_item_title_animation.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent arg0) {
-    			options_manager.setTitleAnimationEnabled(menu_item_title_animation.isSelected());
-    		}
-    	});
+	// Adding a listener to change the value of the state of the title animation
+	menu_item_title_animation.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent arg0) {
+	    	options_manager.setTitleAnimationEnabled(menu_item_title_animation.isSelected());
+	    }
+	});
 
-    	// Adding a listener to display the documentation
-    	menu_item_help.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent evt) {
-    			//Opening the "Help" dialog
-    			new HelpDialog(main_frame);
-    		}
-    	});
+	menu_item_upload.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			new UploadJFrame(main_frame);
+		}
+	});
+	
+	// Adding a listener to display the documentation
+	menu_item_help.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent evt) {
+	    	// Opening the "Help" dialog
+	    	new HelpDialog(main_frame);
+	    }
+	});
 
-    	//Adding actions to the search bar
-    	search_button.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent evt) {
-    			search_manager.actionPerformed(evt);
-    		}
-    	});
+	// Adding actions to the search bar
+	search_button.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent evt) {
+	    	search_manager.actionPerformed(evt);
+	    }
+	});
 
-    	// Adding a listener to clear the search bar
-    	menu_item_clear.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent e) {
-    			main_frame.clearSearchBarText();
-    		}
-    	});
+	// Adding a listener to clear the search bar
+	menu_item_clear.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	    	main_frame.clearSearchBarText();
+	    }
+	});
 
-    	// Adding a listener to detect the concept clicked
-    	concepts_tree.addTreeSelectionListener(new TreeSelectionListener() {
-    		@Override
-    		public void valueChanged(TreeSelectionEvent arg0) {
-    			DefaultMutableTreeNode node = (DefaultMutableTreeNode) concepts_tree.getLastSelectedPathComponent();
-    			Concept cpt = (Concept) node.getUserObject();
-    			ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
-    			HashMap<String, ArrayList<String>> cpt_trm = parser.cpt_trm();
-    		}
-    	});
+	// Adding a listener to detect the concept clicked
+	concepts_tree.addTreeSelectionListener(new TreeSelectionListener() {
+	    @Override
+	    public void valueChanged(TreeSelectionEvent arg0) {
+	    	DefaultMutableTreeNode node = (DefaultMutableTreeNode) concepts_tree.getLastSelectedPathComponent();
+	    	if(node!=null) {
+	    		Concept cpt = (Concept) node.getUserObject();
+	    		addTerms(cpt.getId());
+	    	}
+	    }
+	});
 
-    	//Adding a listener to manage the state of the checkbox in the class OptionsManager
-    	menu_item_title_animation.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent e) {
-    			boolean is_selected = main_frame.menu_item_title_animation.isSelected();
-    			main_frame.options_manager.setTitleAnimationEnabled(is_selected);
-    		}
-    	});
+	// Adding a listener to manage the state of the checkbox in the class
+	// OptionsManager
+	this.menu_item_title_animation.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		boolean is_selected = main_frame.menu_item_title_animation.isSelected();
+		main_frame.options_manager.setTitleAnimationEnabled(is_selected);
+	    }
+	});
 
-    	this.addWindowListener(main_window_closer);
+	this.addWindowListener(main_window_closer);
     }
 
     /**
@@ -737,7 +753,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * setTitleAnimationState is a setter that permits to change the state of
      * the checkbox for the animation of the title label
      * 
-     * @param b: The state of the checkbox (boolean)
+     * @param boolean : The state of the checkbox
      */
     protected void setTitleAnimationState(boolean b) {
     	this.menu_item_title_animation.setSelected(b);

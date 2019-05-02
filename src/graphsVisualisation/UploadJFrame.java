@@ -4,22 +4,24 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * The class UploadJFrame is an extension of the class JFrame that
@@ -40,14 +42,18 @@ public class UploadJFrame extends JFrame {
 	private final String TITLE_LABEL_NAME = "Upload de documents";
     private final byte TITLE_SIZE = 25;
 	
-    //Constants for the upload button
+    //Constants for the buttons
     private final String UPLOAD_BUTTON_TEXT = "Upload !";
+    private final String CHOOSE_BUTTON_TEXT = "Choisir fichier !";
     
     //Constants for the colors
     private final Color DOCUMENTS_PANEL_BORDER_COLOR = Color.GRAY;
     
     //Constants for the icons
     private final String MAIN_ICON_PATH = "ressources/logo.png";
+    
+    //Constants for the JTree
+    private final String ROOT_NODE_NAME = "Documents";
     
 	//Constants for the font
     private final String TITLE_FONT = "Georgia";
@@ -56,7 +62,7 @@ public class UploadJFrame extends JFrame {
     private final short TITLE_PANEL_X = WIDTH-2;
     private final short TITLE_PANEL_Y = HEIGHT/10;
     
-    private final short DOCUMENTS_PANEL_X = TITLE_PANEL_X;
+    private final short DOCUMENTS_PANEL_X = TITLE_PANEL_X-1;
     private final short DOCUMENTS_PANEL_Y = 7*HEIGHT/10;
     
     private final short OPTIONS_PANEL_X = WIDTH-2;
@@ -68,7 +74,19 @@ public class UploadJFrame extends JFrame {
     private final short DOCUMENTS_VIEW_X = DOCUMENTS_PANEL_X;
     private final short DOCUMENTS_VIEW_Y = DOCUMENTS_PANEL_Y-11;
     
+    //Constants for the layouts
+    private final byte OPTIONS_PANEL_LAYOUT_COL = 1;
+    private final byte OPTIONS_PANEL_LAYOUT_ROW = 2;
+    
+    //Constants for the file chooser
+    private final boolean CAN_SELECT_MULTIPLE_DOCUMENTS = false;
+    
+    //Main interface
+    @SuppressWarnings("unused")
+	private VisualisationJFrame main_frame;
+    
     //JButtons
+    private JButton choose_button;
     private JButton upload_button;
     
 	//JPanels
@@ -80,12 +98,10 @@ public class UploadJFrame extends JFrame {
 	private JScrollPane documents_view;
 	
 	//DefaultListModel
-	@SuppressWarnings("rawtypes")
-	private DefaultListModel documents_view_model;
+	private DefaultMutableTreeNode documents_view_node;
 	
-	//JLists
-	@SuppressWarnings({ "rawtypes" })
-	private JList documents_list;
+	//JTree
+	private JTree documents_list;
 	
 	//JLabels
 	private JLabel title_label;
@@ -106,21 +122,24 @@ public class UploadJFrame extends JFrame {
 	//Icons
 	private ImageIcon main_icon;
 	
-	//Layout
+	//Layouts
 	private FlowLayout main_layout;
+	private GridLayout options_panel_layout;
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public UploadJFrame() {
+	public UploadJFrame(VisualisationJFrame main_frame) {
 		//Initialization
+		this.main_frame = main_frame;
+		
 		this.title_panel = new JPanel();
 		this.documents_panel = new JPanel(); 
 		this.options_panel = new JPanel();
 		
-		this.documents_view_model = new DefaultListModel();
+		this.documents_view_node = new DefaultMutableTreeNode(ROOT_NODE_NAME);
 		this.addDocuments();
-		this.documents_list = new JList(documents_view_model);
+		this.documents_list = new JTree(documents_view_node);
 		this.documents_view = new JScrollPane(documents_list);
 		
+		this.choose_button = new JButton(CHOOSE_BUTTON_TEXT);
 		this.upload_button = new JButton(UPLOAD_BUTTON_TEXT);
 		
 		this.title_label = new JLabel(TITLE_LABEL_NAME);
@@ -136,6 +155,7 @@ public class UploadJFrame extends JFrame {
 		this.main_icon = new ImageIcon(MAIN_ICON_PATH);
 		
 		this.main_layout = new FlowLayout();
+		this.options_panel_layout = new GridLayout(OPTIONS_PANEL_LAYOUT_ROW, OPTIONS_PANEL_LAYOUT_COL);
 		
 		//Initialize borders
 		this.documents_panel_border = BorderFactory.createLineBorder(DOCUMENTS_PANEL_BORDER_COLOR);
@@ -165,7 +185,9 @@ public class UploadJFrame extends JFrame {
 		documents_panel.add(documents_view);
 		
 		//Adding elements to the options panel
+		options_panel.add(choose_button);
 		options_panel.add(upload_button);
+		options_panel.setLayout(options_panel_layout);
 		
 		//Adding elements to the interface
 		this.add(title_panel);
@@ -187,10 +209,9 @@ public class UploadJFrame extends JFrame {
 	 * addDocuments() permits to add documents to the list that the
 	 * user has chosen previously
 	 */
-	@SuppressWarnings("unchecked")
 	private void addDocuments() {
 		for(byte i=1; i<=30; i++) {
-			documents_view_model.addElement("Test" + Integer.toString(i));
+			documents_view_node.add(new DefaultMutableTreeNode("Test"+Integer.toString(i)));
 		}
 	}
 	
@@ -198,6 +219,19 @@ public class UploadJFrame extends JFrame {
      * addListeners() permits to add all the listeners for the interface
      */
 	private void addListeners() {
+		//Adding a listener for the choose button
+		choose_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Choosing file ...");
+				
+				JFileChooser fc = new JFileChooser();
+				fc.setMultiSelectionEnabled(CAN_SELECT_MULTIPLE_DOCUMENTS);
+				
+				fc.showOpenDialog(choose_button);
+			}			
+		});
+		
 		//Adding a listener for the upload button
 		upload_button.addActionListener(new ActionListener() {
 			@Override
@@ -208,14 +242,11 @@ public class UploadJFrame extends JFrame {
 		});
 		
 		//Adding a listener for the last selection element of the list
-		documents_list.addListSelectionListener(new ListSelectionListener() {
+		documents_list.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if(!e.getValueIsAdjusting()) {
-					//TODO A changer (Element sélectionné dans la liste)
-					System.out.println(documents_list.getSelectedValue().toString());
-				}
-			}		
+			public void valueChanged(TreeSelectionEvent e) {
+				System.out.println("Document clicked !");				
+			}
 		});
 	}
 }

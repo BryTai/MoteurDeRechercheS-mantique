@@ -36,7 +36,6 @@ public class SearchManager implements ActionListener {
 		try {
 			Indexation.searchIndex(search_bar_content);
 		} catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println(search_bar_content);

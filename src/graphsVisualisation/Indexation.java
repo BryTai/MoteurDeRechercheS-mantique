@@ -56,24 +56,27 @@ public class Indexation {
 
    @SuppressWarnings("unchecked")
 public static void searchIndex(String searchString) throws IOException, ParseException{
-       System.out.println("Rechercher : '" + searchString + "'");
-       Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY);
-       IndexReader indexReader = IndexReader.open(directory);
-       IndexSearcher indexSearcher= new IndexSearcher(indexReader);
+       if(!searchString.equals("")) {
+    	   System.out.println("Rechercher : '" + searchString + "'");
+           Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY);
+           IndexReader indexReader = IndexReader.open(directory);
+           IndexSearcher indexSearcher= new IndexSearcher(indexReader);
 
-       Analyzer analyzer = new StandardAnalyzer();
-       QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
-       Query query = queryParser.parse(searchString);
-       Hits hits = indexSearcher.search(query);
-       System.out.println("Number of hits: " + hits.length());
-       Iterator<Hit> it = hits.iterator();
-       while(it.hasNext()){
-           Hit hit = it.next();
-           Document document = hit.getDocument();
-           String path = document.get(FIELD_PATH);
-           System.out.println("Hit : " + path);
+           Analyzer analyzer = new StandardAnalyzer();
+           QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
+           Query query = queryParser.parse(searchString);
+           Hits hits = indexSearcher.search(query);
+           System.out.println("Number of hits: " + hits.length());
+           Iterator<Hit> it = hits.iterator();
+           while(it.hasNext()){
+               Hit hit = it.next();
+               Document document = hit.getDocument();
+               String path = document.get(FIELD_PATH);
+               System.out.println("Hit : " + path);
+           }
+
        }
-
+	  
 
    }
 

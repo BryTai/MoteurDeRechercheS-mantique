@@ -118,8 +118,8 @@ public class ParserOnto {
 	
 //*************************************************************************************************************************
 	
-	//Parsing des terme dans un dictionnaire avec comme clé les id des termes et en value l'objet correspondant
-	private HashMap<String, Terme> lesTermes(HashMap<String, Concept> dicoCPT){
+	//Parsing des termes dans un dictionnaire avec comme clé les id des termes et en value l'objet correspondant
+	HashMap<String, Terme> lesTermes(HashMap<String, Concept> dicoCPT){
 		//Le dictionnaire final
 		HashMap<String, Terme> dicoTerme = new HashMap<String, Terme>();
 		//Récupération de la langue
