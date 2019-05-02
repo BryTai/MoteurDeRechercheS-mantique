@@ -3,7 +3,7 @@ package graphsVisualisation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
+//import java.text.ParseException;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
 /**
@@ -36,7 +36,7 @@ public class SearchManager implements ActionListener {
 		try {
 			Indexation.searchIndex(search_bar_content);
 		} catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
-			// TODO Auto-generated catch block
+	
 			e.printStackTrace();
 		}
 		System.out.println(search_bar_content);

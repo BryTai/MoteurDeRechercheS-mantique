@@ -481,10 +481,12 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
         
         for (int i = 0 ; i < lesTermes.size();i++) {
         	
-        	
+        	if(term.get(lesTermes.get(i)).getLangue().equals("fr")) {
 	            if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
 	            	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
 	            }
+	            }
+	            
 	        }
         
     	
@@ -550,9 +552,12 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	concepts_tree.addTreeSelectionListener(new TreeSelectionListener() {
 	    @Override
 	    public void valueChanged(TreeSelectionEvent arg0) {
+    	
 	    	DefaultMutableTreeNode node = (DefaultMutableTreeNode) concepts_tree.getLastSelectedPathComponent();
-	    	Concept cpt = (Concept) node.getUserObject();
-	    	addTerms(cpt.getId());
+	    	if (node != null) {
+		    	Concept cpt = (Concept) node.getUserObject();
+		    	addTerms(cpt.getId());
+	    	}
 	    }
 	});
 
