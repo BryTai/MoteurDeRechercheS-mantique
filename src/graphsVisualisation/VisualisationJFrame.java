@@ -470,17 +470,23 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * addTerms permits to add all the terms into the list model
      */
     private void addTerms(String conceptID) {
+    	
     	term_list_model.clear();
+    	
     	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
         HashMap<String,ArrayList<String>> cpt_term = parser.cpt_trm();
         HashMap<String, Concept> cpt = parser.lesConcepts(); 
         HashMap<String, Terme> term = parser.lesTermes(cpt);
         ArrayList<String> lesTermes = cpt_term.get(conceptID);
+        
         for (int i = 0 ; i < lesTermes.size();i++) {
-            if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
-            	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
-            }
-        }
+        	
+        	
+	            if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
+	            	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
+	            }
+	        }
+        
     	
 	}
 
