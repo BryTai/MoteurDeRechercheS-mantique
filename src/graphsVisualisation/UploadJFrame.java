@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -225,10 +226,16 @@ public class UploadJFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Choosing file ...");
 				
+				//Selection of the file to upload
 				JFileChooser fc = new JFileChooser();
 				fc.setMultiSelectionEnabled(CAN_SELECT_MULTIPLE_DOCUMENTS);
-				
 				fc.showOpenDialog(choose_button);
+				
+				//Processing on the selected file
+				File selected_file = fc.getSelectedFile();
+				if(selected_file != null) {
+					System.out.println(selected_file.toString());
+				}
 			}			
 		});
 		
@@ -241,7 +248,7 @@ public class UploadJFrame extends JFrame {
 			}			
 		});
 		
-		//Adding a listener for the last selection element of the list
+		//Adding a listener for the last selectionned element of the list
 		documents_list.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
