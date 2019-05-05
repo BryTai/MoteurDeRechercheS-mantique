@@ -7,8 +7,8 @@ import java.io.IOException;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
 /**
- * The class SearchManager is a class that manages the interactions between the search bar, the search button
- * and the results of the research that are printed on the interface.
+ * Manages the interactions between the search bar, the search button and the results
+ * of the research that are printed on the interface.
  */
 public class SearchManager implements ActionListener {
 	//The main JFrame
@@ -18,17 +18,16 @@ public class SearchManager implements ActionListener {
 	private String search_bar_content;
 	
 	/**
-	 * SearchManager(VisualisationJFrame f) is the main constructor of the class SearchManager.
-	 * @param f: a GraphVisualisationJFrame instance (the main interface)
+	 * Main constructor
+	 * @param f: The main interface
 	 */
 	public SearchManager(VisualisationJFrame f) {
 		this.main_frame = f;
 	}
 
 	/**
-	 * actionPerformed(ActionEvent evt) is a method implemented from the interface ActionListener that permits to
-	 * manage the interactions between the use of the search button and the "printing" of the results of the search
-	 * on the main interface.
+	 * To manage the interactions between the use of the search button and the "printing"
+	 * of the results of the search on the main interface.
 	 */
 	@Override
 	public void actionPerformed(ActionEvent evt) {

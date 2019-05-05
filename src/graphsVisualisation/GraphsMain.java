@@ -10,13 +10,10 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 
-/**
- * The class GraphsMain is the entry point of the program
- */
 @SuppressWarnings("unused")
 public class GraphsMain {
 	/**
-	 * main() is the main method of the program
+	 * The entry point of the program
 	 * @param args: Arguments of the main method
 	 */
 	public static void main(String[] args) {
@@ -48,8 +45,5 @@ public class GraphsMain {
 //		}catch (Exception e ){
 //			e.printStackTrace();
 //		}
-		
-			
-		
 	}
 }

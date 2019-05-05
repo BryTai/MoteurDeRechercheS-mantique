@@ -8,8 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * The class OptionsManager permits to manage every option of the interface, for example
- * the animation of the title when the interface launches.
+ * To manage every option of the interface, for example the animation of
+ * the title when the interface launches.
  */
 public class OptionsManager {
 	//The main frame
@@ -69,7 +69,7 @@ public class OptionsManager {
 	}
 
 	/**
-	 * getOptionsFromFile() permits to read all the options from the file 'options_file'
+	 * To read all the options from the file 'options_file'
 	 */
 	private void getOptionsFromFile() {
 		try {
@@ -104,7 +104,7 @@ public class OptionsManager {
 	}
 	
 	/**
-	 * saveOptions() permits to save the options of the interface in a file 
+	 * To save the options of the interface in a file 
 	 */
 	protected void saveOptions() {	
 		try {
@@ -127,8 +127,7 @@ public class OptionsManager {
 	}
 	
 	/**
-	 * isTitleAnimationEnabled is a getter to access to the state of the option for
-	 * the animation title
+	 * A getter to access to the state of the option for the animation title
 	 * @return boolean : The state of the option
 	 */
 	protected boolean isTitleAnimationEnabled() {
@@ -136,12 +135,10 @@ public class OptionsManager {
 	}
 
 	/**
-	 * setTitleAnimationEnabled is a setter to set the state of the option for
-	 * the animation title
+	 * A setter to set the state of the option for the animation title
 	 * @param is_enabled : The state of the option
 	 */
 	protected void setTitleAnimationEnabled(boolean is_enabled) {
 		this.title_animation_enabled = is_enabled;
 	}
-	
 }

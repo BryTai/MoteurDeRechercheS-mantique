@@ -285,8 +285,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	private final String TRAY_ICON_ADDING_ERROR = "L'icône de notification n'a pas pu être créée !";
 
 	/**
-	 * VisualisationJFrame() is the main constructor of this class. This constructor
-	 * creates all the user interface and is the "entry point" of this one.
+	 * Main constructor of this class. This constructor creates all the interface.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public VisualisationJFrame() {
@@ -511,7 +510,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * addTerms permits to add all the terms into the list model
+	 * To add all the terms into the list model
 	 * @param conceptID : the ID of the concept which have some terms
 	 */
 	private void addTerms(String conceptID) {
@@ -570,6 +569,9 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 		}
 	}
 	
+	/**
+	 * To add all the documents linked to a term in the list of terms
+	 */
 	@SuppressWarnings("unchecked")
 	private void addDocuments() {
 		String document_to_add;
@@ -683,16 +685,15 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * addElementsToTree() permits to create the tree structure and to add it to the
+	 * To create the tree structure and to add it to the
 	 * root of the tree
-	 * 
 	 * @param top: The root of the tree structure
 	 */
 	private void addElementsToTree(DefaultMutableTreeNode top) {
 		// Le parser du json
 		ParserOnto parser = new ParserOnto("ressources/clean_data.json");
 
-		// La map des concept
+		// La map des concepts
 		HashMap<String, Concept> lesCpts = parser.lesConcepts();
 		// La map contenant les ids des concepts en clé et les objets swing en
 		// value
@@ -723,8 +724,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * addTrayIconAndMenu() permits to add an icon (and a menu with it) to the
-	 * system tray
+	 * To add an icon (and a menu with it) to the system tray
 	 */
 	private void addTrayIconAndMenu() {
 		// If there is a system tray, adding the menu and the tray icons
@@ -761,8 +761,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getMainFrame() is a getter to access to the main frame
-	 * 
+	 * A getter to access to the main frame
 	 * @return VisualisationJFrame : An instance of the main frame
 	 */
 	protected VisualisationJFrame getMainFrame() {
@@ -770,8 +769,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getMainTrayIcon() is a getter to access to the main tray icon
-	 * 
+	 * A getter to access to the main tray icon 
 	 * @return TrayIcon : This getter returns the main tray icon
 	 */
 	protected TrayIcon getMainTrayIcon() {
@@ -779,7 +777,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getSystemTray() is a getter to access to the system tray
+	 * A getter to access to the system tray
 	 * 
 	 * @return SystemTray : This getter returns the system tray
 	 */
@@ -788,8 +786,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getSearchBarText() is a getter to access to the content of the search_bar
-	 * 
+	 * A getter to access to the content of the search_bar
 	 * @return String : This getter returns the content of the search bar
 	 */
 	protected String getSearchBarText() {
@@ -797,15 +794,14 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * clearSearchBarText() is a method to clear the content of the search bar
+	 * To clear the content of the search bar
 	 */
 	protected void clearSearchBarText() {
 		this.search_bar.setText("");
 	}
 
 	/**
-	 * getTitleLabel() is a getter to access to the title label above the search bar
-	 * 
+	 * A getter to access to the title label above the search bar
 	 * @return JLabel : This getter returns the title label
 	 */
 	protected JLabel getTitleLabel() {
@@ -813,8 +809,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getTitleLabelY() is a getter to access to the y position of the title label
-	 * 
+	 * A getter to access to the y position of the title label
 	 * @return int : This getter returns the y position of the label
 	 */
 	protected int getTitleLabelY() {
@@ -822,8 +817,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getTitleLabelX() is a getter to access to the x position of the title label
-	 * 
+	 * A getter to access to the x position of the title label
 	 * @return int : This getter returns the x position of the label
 	 */
 	protected int getTitleLabelX() {
@@ -831,9 +825,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getTitleLabelEffect is a getter to access to the class that manages the
+	 * A getter to access to the class that manages the
 	 * effect of the title label
-	 * 
 	 * @return TitleLabelApparitionEffect : This getter returns the instance of the
 	 *         class that manages the effect of the title label
 	 */
@@ -842,9 +835,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * getOptionsManager is a getter to access to the class that manages the options
+	 * A getter to access to the class that manages the options
 	 * of the interface
-	 * 
 	 * @return OptionsManager : an instance of the class that manages the options of
 	 *         the interface
 	 */
@@ -853,9 +845,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * setTitleAnimationState is a setter that permits to change the state of the
+	 * A setter to change the state of the
 	 * checkbox for the animation of the title label
-	 * 
 	 * @param b: The state of the checkbox
 	 */
 	protected void setTitleAnimationState(boolean b) {
@@ -863,9 +854,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * actionPerformed() is a method implemented with ActionListener that manages
-	 * the shortcuts actions
-	 * 
+	 * To manages the shortcuts actions
 	 * @param e: The event catched
 	 */
 	@Override

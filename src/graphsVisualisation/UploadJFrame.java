@@ -25,9 +25,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * The class UploadJFrame is an extension of the class JFrame that
- * permits to show an interface to the user to help him choose 
- * the documents that he has to upload
+ * An interface to the user to help him choose the documents that he has to upload
  */
 public class UploadJFrame extends JFrame {
 	private static final long serialVersionUID = -7498139402373436629L;
@@ -127,6 +125,10 @@ public class UploadJFrame extends JFrame {
 	private FlowLayout main_layout;
 	private GridLayout options_panel_layout;
 	
+	/**
+	 * Main constructor
+	 *@param main_frame: The main interface
+	 */
 	public UploadJFrame(VisualisationJFrame main_frame) {
 		//Initialization
 		this.main_frame = main_frame;
@@ -207,8 +209,7 @@ public class UploadJFrame extends JFrame {
 	}
 	
 	/**
-	 * addDocuments() permits to add documents to the list that the
-	 * user has chosen previously
+	 * To add documents to the list that the user has chosen previously
 	 */
 	private void addDocuments() {
 		for(byte i=1; i<=30; i++) {
@@ -217,7 +218,7 @@ public class UploadJFrame extends JFrame {
 	}
 	
 	/**
-     * addListeners() permits to add all the listeners for the interface
+     * To add all the listeners for the interface
      */
 	private void addListeners() {
 		//Adding a listener for the choose button

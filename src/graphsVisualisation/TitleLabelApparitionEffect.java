@@ -3,9 +3,7 @@ package graphsVisualisation;
 import javax.swing.JLabel;
 
 /**
- * The class TitleLabelApparitionEffect is a extension of the class Thread that
- * permits to make a fade-in apparition for the element "title_label" in the
- * GraphVisualisationJFrame class.
+ * To make a fade-in apparition for the element "title_label" in the VisualisationJFrame class.
  */
 public class TitleLabelApparitionEffect extends Thread {
     // Elements of the interface
@@ -62,32 +60,31 @@ public class TitleLabelApparitionEffect extends Thread {
     }
 
     /**
-     * run() is the main method for starting the thread.
+     * Main method for starting the animation thread.
      */
     public void run() {
-	if (this.main_frame != null && this.title_label != null) {
-	    try {
-		Thread.sleep(FIRST_TIME_TO_WAIT);
-	    } catch (InterruptedException e1) {
-		e1.printStackTrace();
-	    }
+		if (this.main_frame != null && this.title_label != null) {
+		    try {
+				Thread.sleep(FIRST_TIME_TO_WAIT);
+		    } catch (InterruptedException e1) {
+				e1.printStackTrace();
+		    }
 
-	    // For every steps, changing the x position value and updating this
-	    // value
-	    for (byte i = 1; i <= NB_OPERATIONS; i++) {
-		try {
-		    title_label.setLocation(title_label_x, initial_label_y);
-		    title_label_x = jlabel_max_x - (width_to_run / NB_OPERATIONS * i);
+		    // For every steps, changing the x position value and updating this value
+		    for (byte i = 1; i <= NB_OPERATIONS; i++) {
+				try {
+			    	title_label.setLocation(title_label_x, initial_label_y);
+			    	title_label_x = jlabel_max_x - (width_to_run / NB_OPERATIONS * i);
 
-		    Thread.sleep(TIME_BETWEEN_OPERATION);
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
+			    	Thread.sleep(TIME_BETWEEN_OPERATION);
+				} catch (InterruptedException e) {
+				    e.printStackTrace();
+				}
+		    }
+
+		    title_label.setLocation(initial_label_x, initial_label_y);
+		} else {
+		    System.out.println("Erreur de lancement de l'animation pour l'element title_label");
 		}
-	    }
-
-	    title_label.setLocation(initial_label_x, initial_label_y);
-	} else {
-	    System.out.println("Erreur de lancement de l'animation pour l'element title_label");
-	}
     }
 }
