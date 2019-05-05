@@ -14,7 +14,12 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -265,7 +270,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	private final byte TITLE_LABEL_SIZE = 25;
 
 	// Constants for the font of the elements in lists/trees
-	private final byte ELEMENTS_FONT_SIZE = 12;
+	private final byte ELEMENTS_FONT_SIZE = 16;
 
 	// Constants for the labels in results_panel
 	private final String ROOT_NODE_NAME = "Liste des concepts";
@@ -275,7 +280,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	// Constants for the logs file
 	private final String LOG_FILE_NAME = "debug/log.txt";
 	private final boolean APPEND_TO_FILE = true;
-	
+
 	// Constants for the errors
 	private final String TRAY_ICON_ADDING_ERROR = "L'icône de notification n'a pas pu être créée !";
 
@@ -285,6 +290,12 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public VisualisationJFrame() {
+		try {
+			System.setOut(new PrintStream(new BufferedOutputStream(new FileOutputStream(LOG_FILE_NAME)), true));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
 		// Initialize frame
 		this.main_frame = this;
 
@@ -411,7 +422,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
 		terms_view.setPreferredSize(terms_view_dimension);
 
+		term_list.setFont(list_elements_font);
+
 		documents_panel.setPreferredSize(documents_panel_dimension);
+		
+		documents_list.setFont(list_elements_font);
 
 		// Settings of the labels in results panel
 		terms_label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -493,10 +508,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 		this.setIconImage(main_icon.getImage()); // To set an icon at the top left of the interface
 		this.addTrayIconAndMenu(); // To set an icon and menu on the system tray
 		this.setVisible(IS_VISIBLE); // To make the JFrame visible on the screen
-	}	
-	
+	}
+
 	/**
 	 * addTerms permits to add all the terms into the list model
+	 * @param conceptID : the ID of the concept which have some terms
 	 */
 	private void addTerms(String conceptID) {
 		term_list_model.clear();
@@ -507,18 +523,66 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 		HashMap<String, Terme> term = parser.lesTermes(cpt);
 		ArrayList<String> lesTermes = cpt_term.get(conceptID);
 
+		String term_to_add;
+
 		for (int i = 0; i < lesTermes.size(); i++) {
 			if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
-				this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
+				term_to_add = term.get(lesTermes.get(i)).getName();
+
+				term_to_add = "- " + capitalize(term_to_add);
+				this.term_list_model.addElement(term_to_add);
 			}
 		}
+		
+		this.term_list_model = orderListModel(term_list_model);
 	}
 
+	/**
+	 * Ordering by alphabetical order elements of the default list model 
+	 * @param list_model: The list model to order
+	 * @return the ordered the list model
+	 */
+	private DefaultListModel<String> orderListModel(DefaultListModel<String> list_model){
+		//Sorting in alphabetical order
+		ArrayList<String> list = new ArrayList<>();
+		for (int i = 0; i < list_model.size(); i++) {
+			list.add(list_model.get(i));
+		}
+		Collections.sort(list);
+		list_model.removeAllElements();
+		for (String s : list) {
+			list_model.addElement(s);
+		}
+		
+		return list_model;
+	}
+	
+	/**
+	 * Put the first letter of the string in uppercase
+	 * @param str: The string to capitalize
+	 * @return The capitalized string
+	 */
+	private String capitalize(String str) {
+		if (!str.equals("")) {
+			return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+		}else {
+			return "";
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void addDocuments() {
+		String document_to_add;
 		for (byte i = 0; i < 30; i++) {
-			documents_list_model.addElement("- test" + Byte.toString(i));
+			document_to_add = "- test" + Byte.toString(i);
+			if (!document_to_add.equals("")) {
+				document_to_add = Character.toUpperCase(document_to_add.charAt(0)) + document_to_add.substring(1);
+			}
+
+			documents_list_model.addElement(document_to_add);
 		}
+		
+		this.documents_list_model = orderListModel(documents_list_model);
 	}
 
 	/**
@@ -792,7 +856,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	 * setTitleAnimationState is a setter that permits to change the state of the
 	 * checkbox for the animation of the title label
 	 * 
-	 * @param boolean : The state of the checkbox
+	 * @param b: The state of the checkbox
 	 */
 	protected void setTitleAnimationState(boolean b) {
 		this.menu_item_title_animation.setSelected(b);

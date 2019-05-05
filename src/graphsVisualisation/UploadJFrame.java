@@ -212,7 +212,7 @@ public class UploadJFrame extends JFrame {
 	 */
 	private void addDocuments() {
 		for(byte i=1; i<=30; i++) {
-			documents_view_node.add(new DefaultMutableTreeNode("Test"+Integer.toString(i)));
+			documents_view_node.add(new DefaultMutableTreeNode("- Test"+Integer.toString(i)));
 		}
 	}
 	
