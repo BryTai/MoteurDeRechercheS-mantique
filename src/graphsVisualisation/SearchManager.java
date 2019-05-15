@@ -3,6 +3,7 @@ package graphsVisualisation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.*;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
@@ -32,12 +33,43 @@ public class SearchManager implements ActionListener {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent evt) {
+//		int i = 0;
+//		boolean trouve = false;
 		search_bar_content = main_frame.getSearchBarText();
-		try {
-			Indexation.searchIndex(search_bar_content);
-		} catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
-			e.printStackTrace();
-		}
-		System.out.println(search_bar_content);
+
+//		ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
+//		HashMap<String,ArrayList<String>> cpt_term = parser.cpt_trm();
+//		HashMap<String, Concept> cpt = parser.lesConcepts(); 
+//		HashMap<String, Terme> term = parser.lesTermes(cpt);
+//		ArrayList<String> lesTermes = cpt_term.get(cpt.get(i));
+//		
+//		
+//		System.out.println("TEST1");
+//		System.out.println(term.get(lesTermes.get(i)).getName());
+		
+		
+//		while (trouve){
+//			System.out.println("TEST2");
+//			cpt_term.get(cpt.get(i));
+//			if (search_bar_content == term.get(lesTermes.get(i)).getName()){
+//				
+//				//ACCES AUX DOCS
+//				System.out.println("TEST3");
+//				trouve = true;
+//
+//			}else {
+				try {
+					Indexation.searchIndex(search_bar_content);
+				} catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
+					e.printStackTrace();
+				}
+				System.out.println(search_bar_content);
+			}
+
+
+			//}
+
+//		search_bar_content = main_frame.getSearchBarText();
+
 	}
-}
+//}

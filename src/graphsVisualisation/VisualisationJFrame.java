@@ -266,13 +266,22 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     // Constants for the errors
     private final String TRAY_ICON_ADDING_ERROR = "L'icône de notification n'a pas pu être créée !";
 
+	private HashMap<String, ArrayList<String>> cpt_term;
+	private HashMap<String, Concept> cpt;
+	private HashMap<String, Terme> term;
     /**
      * VisualisationJFrame() is the main constructor of this class. This
      * constructor creates all the user interface and is the "entry point" of
      * this one.
      */
-    public VisualisationJFrame() {
-	// Initialize frame
+    public VisualisationJFrame(HashMap<String,ArrayList<String>> cpt_term,  HashMap<String, Concept> cpt, HashMap<String, Terme> term  ) {
+	
+    this.cpt_term = cpt_term;
+    this.cpt = cpt;
+    this.term = term;
+    
+    	
+    // Initialize frame
 	this.main_frame = this;
 
 	// Initialize font
@@ -480,13 +489,10 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     private void addTerms(String conceptID) {
     	term_list_model.clear();
     	
-    	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
-        HashMap<String,ArrayList<String>> cpt_term = parser.cpt_trm();
-        HashMap<String, Concept> cpt = parser.lesConcepts(); 
-        HashMap<String, Terme> term = parser.lesTermes(cpt);
         ArrayList<String> lesTermes = cpt_term.get(conceptID);
-        
+        System.out.println(conceptID);
         for (int i = 0 ; i < lesTermes.size();i++) {
+        	
         	if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
 	           	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
 	        }
@@ -587,18 +593,10 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * @param top: The root of the tree structure
      */
     private void addElementsToTree(DefaultMutableTreeNode top) {
-	// Le parser du json
-	ParserOnto parser = new ParserOnto("ressources/clean_data.json");
 
-	// La map des concept
-	HashMap<String, Concept> lesCpts = parser.lesConcepts();
-	// La map contenant les ids des concepts en clé et les objets swing en
-	// value
 	HashMap<String, DefaultMutableTreeNode> arborescence = new HashMap<String, DefaultMutableTreeNode>();
 
-	// On parcourt la map des concepts pour initialisé celle des objets
-	// swing
-	for (Entry<String, Concept> cpt : lesCpts.entrySet()) {
+	for (Entry<String, Concept> cpt : cpt.entrySet()) {
 
 	    arborescence.put(cpt.getKey(), new DefaultMutableTreeNode(cpt.getValue()));
 	}
@@ -608,7 +606,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	// Si le concept n'as pas de isa on peut directement l'ajouter comme
 	// racine
 	// de l'arborescence
-	for (Entry<String, Concept> cpt : lesCpts.entrySet()) {
+	for (Entry<String, Concept> cpt : cpt.entrySet()) {
 	    if (cpt.getValue().getIsa().length == 0) {
 	    	top.add(arborescence.get(cpt.getKey()));
 	    }

@@ -25,8 +25,11 @@ public class GraphsMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		new VisualisationJFrame();
+		ParserOnto parser = new ParserOnto("./ressources//clean_data.json");
+		HashMap<String, Concept> lesCpts = parser.lesConcepts();
+		HashMap<String, Terme> lestrm = parser.lesTermes(lesCpts);
+		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
+		new VisualisationJFrame(cpt_term, lesCpts, lestrm);
 		
 		//new UploadJFrame();
 		
