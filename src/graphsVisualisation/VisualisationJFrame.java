@@ -47,8 +47,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * The class VisualisationJFrame is an extension of the class JFrame that
- * permits to show an interface to the user to help him browse the results of
+ * To show an interface to the user to help him browse the results of
  * the indexed documents of our semantic search engine.
  */
 @SuppressWarnings("unused")
@@ -277,10 +276,6 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	private final String TERMS_LABEL_NAME = "Liste des termes";
 	private final String DOCUMENTS_LABEL_NAME = "Documents";
 
-	// Constants for the logs file
-	private final String LOG_FILE_NAME = "debug/log.txt";
-	private final boolean APPEND_TO_FILE = true;
-
 	// Constants for the errors
 	private final String TRAY_ICON_ADDING_ERROR = "L'icône de notification n'a pas pu être créée !";
 
@@ -289,12 +284,6 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public VisualisationJFrame() {
-		try {
-			System.setOut(new PrintStream(new BufferedOutputStream(new FileOutputStream(LOG_FILE_NAME)), true));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
 		// Initialize frame
 		this.main_frame = this;
 
@@ -515,24 +504,25 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	 */
 	private void addTerms(String conceptID) {
 		term_list_model.clear();
+    	
+    	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
+        HashMap<String,ArrayList<String>> cpt_term = parser.cpt_trm();
+        HashMap<String, Concept> cpt = parser.lesConcepts(); 
+        HashMap<String, Terme> term = parser.lesTermes(cpt);
+        ArrayList<String> lesTermes = cpt_term.get(conceptID);
+        
+        String term_to_add;
+        
+        for (int i = 0 ; i < lesTermes.size();i++) {
+        	if(term.get(lesTermes.get(i)).getLangue().equals("fr")) {
+	            if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
+	            	term_to_add = term.get(lesTermes.get(i)).getName();
+	            	term_to_add = "- " + capitalize(term_to_add);
+					this.term_list_model.addElement(term_to_add);
+	            }
+        	}
+        }
 
-		ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
-		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
-		HashMap<String, Concept> cpt = parser.lesConcepts();
-		HashMap<String, Terme> term = parser.lesTermes(cpt);
-		ArrayList<String> lesTermes = cpt_term.get(conceptID);
-
-		String term_to_add;
-
-		for (int i = 0; i < lesTermes.size(); i++) {
-			if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
-				term_to_add = term.get(lesTermes.get(i)).getName();
-
-				term_to_add = "- " + capitalize(term_to_add);
-				this.term_list_model.addElement(term_to_add);
-			}
-		}
-		
 		this.term_list_model = orderListModel(term_list_model);
 	}
 
@@ -564,9 +554,9 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	private String capitalize(String str) {
 		if (!str.equals("")) {
 			return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-		}else {
-			return "";
 		}
+		
+		return "";
 	}
 	
 	/**
@@ -588,7 +578,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * addListeners() permits to add all the listeners for the interface
+	 * To add all the listeners for the interface
 	 */
 	private void addListeners() {
 		// Adding a listener to quit the interface
@@ -610,6 +600,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 			}
 		});
 
+		//Adding a listener to get the selected element in the document list
 		documents_list.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -673,7 +664,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
 		// Adding a listener to manage the state of the checkbox in the class
 		// OptionsManager
-		this.menu_item_title_animation.addActionListener(new ActionListener() {
+		menu_item_title_animation.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean is_selected = main_frame.menu_item_title_animation.isSelected();
@@ -761,33 +752,32 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * A getter to access to the main frame
-	 * @return VisualisationJFrame : An instance of the main frame
+	 * To access to the main frame
+	 * @return The main frame
 	 */
 	protected VisualisationJFrame getMainFrame() {
 		return main_frame;
 	}
 
 	/**
-	 * A getter to access to the main tray icon 
-	 * @return TrayIcon : This getter returns the main tray icon
+	 * To access to the main tray icon 
+	 * @return The main tray icon
 	 */
 	protected TrayIcon getMainTrayIcon() {
 		return main_tray_icon;
 	}
 
 	/**
-	 * A getter to access to the system tray
-	 * 
-	 * @return SystemTray : This getter returns the system tray
+	 * To access to the system tray
+	 * @return The system tray
 	 */
 	protected SystemTray getSystemTray() {
 		return system_tray;
 	}
 
 	/**
-	 * A getter to access to the content of the search_bar
-	 * @return String : This getter returns the content of the search bar
+	 * To access to the content of the search_bar
+	 * @return The content of the search bar
 	 */
 	protected String getSearchBarText() {
 		return this.search_bar.getText();
@@ -801,51 +791,49 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * A getter to access to the title label above the search bar
-	 * @return JLabel : This getter returns the title label
+	 * To access to the title label above the search bar
+	 * @return An instance of the title label
 	 */
 	protected JLabel getTitleLabel() {
 		return title_label;
 	}
 
 	/**
-	 * A getter to access to the y position of the title label
-	 * @return int : This getter returns the y position of the label
+	 * To access to the y position of the title label
+	 * @return The y position of the label
 	 */
 	protected int getTitleLabelY() {
 		return title_label.getY();
 	}
 
 	/**
-	 * A getter to access to the x position of the title label
-	 * @return int : This getter returns the x position of the label
+	 * To access to the x position of the title label
+	 * @return The x position of the label
 	 */
 	protected int getTitleLabelX() {
 		return title_label.getX();
 	}
 
 	/**
-	 * A getter to access to the class that manages the
-	 * effect of the title label
-	 * @return TitleLabelApparitionEffect : This getter returns the instance of the
-	 *         class that manages the effect of the title label
+	 * To access to the class that manages the effect of the title label
+	 * @return TitleLabelApparitionEffect : The instance of the class 
+	 * that manages the effect of the title label
 	 */
 	protected TitleLabelApparitionEffect getTitleLabelEffect() {
 		return title_label_effect;
 	}
 
 	/**
-	 * A getter to access to the class that manages the options
-	 * of the interface
-	 * @return OptionsManager : an instance of the class that manages the options of
-	 *         the interface
+	 * To access to the class that manages the options of the interface
+	 * @return OptionsManager : an instance of the class that manages 
+	 * the options of the interface
 	 */
 	protected OptionsManager getOptionsManager() {
 		return options_manager;
 	}
 
 	/**
-	 * A setter to change the state of the
+	 * To change the state of the
 	 * checkbox for the animation of the title label
 	 * @param b: The state of the checkbox
 	 */

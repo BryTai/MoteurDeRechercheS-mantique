@@ -1,5 +1,6 @@
 package graphsVisualisation;
 
+import java.awt.SystemTray;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -77,7 +78,10 @@ public class WindowCloser implements WindowListener {
      * To quit completely the main frame, remove the icon tray and exiting the program
      */
     protected void quit() {
-        main_frame.getSystemTray().remove(main_frame.getMainTrayIcon());
+        if(SystemTray.isSupported()) {
+        	main_frame.getSystemTray().remove(main_frame.getMainTrayIcon());
+        }
+ 
         main_frame.getOptionsManager().saveOptions();
         main_frame.dispose();
         System.exit(0);
