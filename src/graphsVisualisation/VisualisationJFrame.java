@@ -15,6 +15,7 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -99,6 +100,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     // JScrollPane
     private JScrollPane concepts_tree_view;
     private JScrollPane terms_view;
+	private JScrollPane documents_view;
 
     // DefaultMutableTreeNode
     private DefaultMutableTreeNode root_node;
@@ -109,9 +111,13 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
     // JList
     private JList<String> term_list;
+	@SuppressWarnings("rawtypes")
+	private JList documents_list;
     
     // DefaultListModel
     private DefaultListModel<String> term_list_model;
+	@SuppressWarnings("rawtypes")
+	private DefaultListModel documents_list_model;
     
     // Dimensions
     private Dimension search_panel_dimension;
@@ -122,6 +128,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     private Dimension terms_panel_dimension;
     private Dimension terms_view_dimension;
     private Dimension documents_panel_dimension;
+	private Dimension documents_view_dimension;
     private Dimension title_label_dimension;
     private Dimension terms_label_dimension;
     private Dimension documents_label_dimension;
@@ -229,6 +236,9 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
     
     private final short DOCUMENTS_LABEL_X = DOCUMENTS_PANEL_X;
     private final short DOCUMENTS_LABEL_Y = 15;
+    
+	private final short DOCUMENTS_VIEW_X = DOCUMENTS_PANEL_X + 3;
+	private final short DOCUMENTS_VIEW_Y = DOCUMENTS_PANEL_Y - TITLE_LABEL_Y + 3;
 
     // Constants for the dimensions of the borders of the panels
     private final byte CONCEPTS_PANEL_BORDER_TOP = 0;
@@ -274,6 +284,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
      * constructor creates all the user interface and is the "entry point" of
      * this one.
      */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
     public VisualisationJFrame(HashMap<String,ArrayList<String>> cpt_term,  HashMap<String, Concept> cpt, HashMap<String, Terme> term  ) {
 	
     this.cpt_term = cpt_term;
@@ -297,6 +308,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.terms_panel_dimension = new Dimension(TERMS_PANEL_X, TERMS_PANEL_Y);
 	this.terms_view_dimension = new Dimension(TERMS_VIEW_X, TERMS_VIEW_Y);
 	this.documents_panel_dimension = new Dimension(DOCUMENTS_PANEL_X, DOCUMENTS_PANEL_Y);
+	this.documents_view_dimension = new Dimension(DOCUMENTS_VIEW_X, DOCUMENTS_VIEW_Y);
 	this.title_label_dimension = new Dimension(TITLE_LABEL_X, TITLE_LABEL_Y);
 	this.terms_label_dimension = new Dimension(TERMS_LABEL_X, TERMS_LABEL_Y);
 	this.documents_label_dimension = new Dimension(DOCUMENTS_LABEL_X, DOCUMENTS_LABEL_Y);
@@ -327,7 +339,6 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
 	// Initialize elements in the results panel
 	this.results_panel = new JPanel();
-
 	this.concepts_panel = new JPanel();
 
 	this.root_node = new DefaultMutableTreeNode(ROOT_NODE_NAME);
@@ -338,12 +349,15 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.terms_panel = new JPanel();
 	this.terms_label = new JLabel(TERMS_LABEL_NAME);
 	this.term_list_model = new DefaultListModel<String>();
-	//this.addTerms();
 	this.term_list = new JList<String>(term_list_model);
 	this.terms_view = new JScrollPane(term_list);
 
 	this.documents_panel = new JPanel();
 	this.documents_label = new JLabel(DOCUMENTS_LABEL_NAME);
+	this.documents_list_model = new DefaultListModel();
+	this.addDocuments();
+	this.documents_list = new JList(documents_list_model);
+	this.documents_view = new JScrollPane(documents_list);
 
 	// Initialize layouts
 	this.main_layout = new FlowLayout();
@@ -402,7 +416,10 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	
 	terms_view.setPreferredSize(terms_view_dimension);
 	
+	term_list.setFont(list_elements_font);
+	
 	documents_panel.setPreferredSize(documents_panel_dimension);
+	documents_list.setFont(list_elements_font);
 
 	// Settings of the labels in results panel
 	terms_label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -412,6 +429,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	documents_label.setHorizontalAlignment(SwingConstants.CENTER);
 	documents_label.setPreferredSize(documents_label_dimension);
 	documents_label.setBorder(documents_border);
+	
+	documents_view.setPreferredSize(documents_view_dimension);
 
 	// Adding items to the menus of the menubar
 	menu_file.add(menu_item_quit);
@@ -435,6 +454,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
 	// Adding elements to the documents panel
 	documents_panel.add(documents_label, results_panel_gbc);
+	documents_panel.add(documents_view, results_panel_gbc);
 
 	// Adding elements to the title panel
 	title_panel.add(title_label);
@@ -482,22 +502,104 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	this.addTrayIconAndMenu(); // To set an icon and menu on the system tray
 	this.setVisible(IS_VISIBLE); // To make the JFrame visible on the screen
     }
+	
+//  /**
+//  * addTerms permits to add all the terms into the list model
+//  */
+// private void addTerms(String conceptID) {
+// 	term_list_model.clear();
+// 	
+//     ArrayList<String> lesTermes = cpt_term.get(conceptID);
+//     System.out.println(conceptID);
+//     for (int i = 0 ; i < lesTermes.size();i++) {
+//     	
+//     	if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
+//	           	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
+//	        }
+//	    }            	
+//	}
     
-    /**
-     * addTerms permits to add all the terms into the list model
-     */
-    private void addTerms(String conceptID) {
-    	term_list_model.clear();
+	/**
+	 * To add all the terms into the list model
+	 * @param conceptID : the ID of the concept which have some terms
+	 */
+	private void addTerms(String conceptID) {
+		term_list_model.clear();
     	
+    	ParserOnto parser = new ParserOnto("./ressources/clean_data.json");
+        HashMap<String,ArrayList<String>> cpt_term = parser.cpt_trm();
+        HashMap<String, Concept> cpt = parser.lesConcepts(); 
+        HashMap<String, Terme> term = parser.lesTermes(cpt);
         ArrayList<String> lesTermes = cpt_term.get(conceptID);
-        System.out.println(conceptID);
+        
+        String term_to_add;
+        
         for (int i = 0 ; i < lesTermes.size();i++) {
-        	
-        	if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
-	           	this.term_list_model.addElement(term.get(lesTermes.get(i)).getName());
-	        }
-	    }            	
+        	if(term.get(lesTermes.get(i)).getLangue().equals("fr")) {
+	            if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
+	            	term_to_add = term.get(lesTermes.get(i)).getName();
+	            	term_to_add = "- " + capitalize(term_to_add);
+					this.term_list_model.addElement(term_to_add);
+	            }
+        	}
+        }
+
+		this.term_list_model = orderListModel(term_list_model);
 	}
+	
+	/**
+	 * Ordering by alphabetical order elements of the default list model 
+	 * @param list_model: The list model to order
+	 * @return the ordered the list model
+	 */
+	private DefaultListModel<String> orderListModel(DefaultListModel<String> list_model){
+		//Sorting in alphabetical order
+		ArrayList<String> list = new ArrayList<>();
+		for (int i = 0; i < list_model.size(); i++) {
+			list.add(list_model.get(i));
+		}
+		Collections.sort(list);
+		list_model.removeAllElements();
+		for (String s : list) {
+			list_model.addElement(s);
+		}
+		
+		return list_model;
+	}
+	
+	
+	
+	/**
+	 * Put the first letter of the string in uppercase
+	 * @param str: The string to capitalize
+	 * @return The capitalized string
+	 */
+	private String capitalize(String str) {
+		if (!str.equals("")) {
+			return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * To add all the documents linked to a term in the list of terms
+	 */
+	@SuppressWarnings("unchecked")
+	private void addDocuments() {
+		String document_to_add;
+		for (byte i = 0; i < 30; i++) {
+			document_to_add = "- test" + Byte.toString(i);
+			if (!document_to_add.equals("")) {
+				document_to_add = Character.toUpperCase(document_to_add.charAt(0)) + document_to_add.substring(1);
+			}
+
+			documents_list_model.addElement(document_to_add);
+		}
+		
+		this.documents_list_model = orderListModel(documents_list_model);
+	}
+
 
 	/**
      * addListeners() permits to add all the listeners for the interface
@@ -518,6 +620,17 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 		public void valueChanged(ListSelectionEvent e) {
 			if(!e.getValueIsAdjusting()) {
 				//System.out.println(main_frame.term_list.getSelectedValue().toString());
+			}
+		}
+	});
+	
+
+	//Adding a listener to get the selected element in the document list
+	documents_list.addListSelectionListener(new ListSelectionListener() {
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				System.out.println(documents_list.getSelectedValue().toString());
 			}
 		}
 	});
