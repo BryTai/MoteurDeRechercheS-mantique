@@ -302,8 +302,9 @@ public class UploadJFrame extends JFrame {
 		
 		//Adding elements to the options panel
 		options_panel.add(choose_button);
-		options_panel.add(download_button);
 		options_panel.add(upload_button);
+		options_panel.add(download_button);
+
 		
 		//Adding elements to the interface
 		this.add(title_panel);
