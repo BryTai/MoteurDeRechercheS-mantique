@@ -6,9 +6,11 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
@@ -29,9 +31,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
- * The class UploadJFrame is an extension of the class JFrame that
- * permits to show an interface to the user to help him choose 
- * the documents that he has to upload
+ * An interface to help the user choosing the documents that he has to upload
  */
 public class UploadJFrame extends JFrame {
 	private static final long serialVersionUID = -7498139402373436629L;
@@ -51,12 +51,13 @@ public class UploadJFrame extends JFrame {
     private final String FILE_CHOSEN_PREFIX = "Fichier choisi : ";
     private final String NO_FILE_CHOSEN = "Aucun fichier choisi !";
     private final byte FILE_CHOSEN_MAX_LENGTH = 50;
-	
+    
     //Constants for the buttons
     private final String DOWNLOAD_BUTTON_TEXT = "Download !";
     private final String UPLOAD_BUTTON_TEXT = "Upload !";
     private final String CHOOSE_BUTTON_TEXT = "Choisir fichier !";
     
+
     //Constants for the paths
     private final String MAIN_ICON_PATH = "ressources/logo.png";
     protected final String DOWNLOADED_DOCUMENTS_PATH = "downloaded docs";
@@ -123,6 +124,7 @@ public class UploadJFrame extends JFrame {
     
     //Upload interface
     private UploadJFrame upload_frame;
+
     
     //JButtons
     private JButton choose_button;
@@ -183,8 +185,14 @@ public class UploadJFrame extends JFrame {
 	private SuccessDialog success_dialog;
 	@SuppressWarnings("unused")
 	private ErrorDialog error_dialog;
-
 	
+	//Files
+	private File chosen_file;
+	
+	/**
+	 * Main constructor
+	 *@param main_frame: The main interface
+	 */
 	public UploadJFrame(VisualisationJFrame main_frame) {
 		//Initialization
 		this.main_frame = main_frame;
@@ -192,7 +200,9 @@ public class UploadJFrame extends JFrame {
 		this.upload_frame = this;
 		
 		this.title_panel = new JPanel();
+
 		this.documents_panel = new JPanel(); 
+
 		this.file_chosen_panel = new JPanel();
 		this.options_panel = new JPanel();
 		
@@ -219,6 +229,7 @@ public class UploadJFrame extends JFrame {
 		this.title_panel_dimension = new Dimension(TITLE_PANEL_X, TITLE_PANEL_Y);
 		this.documents_panel_dimension = new Dimension(DOCUMENTS_PANEL_X, DOCUMENTS_PANEL_Y);
 		this.options_panel_dimension = new Dimension(OPTIONS_PANEL_X, OPTIONS_PANEL_Y);
+
 		this.file_chosen_panel_dimension = new Dimension(FILE_CHOSEN_PANEL_X, FILE_CHOSEN_PANEL_Y);
 		this.file_chosen_label_dimension = new Dimension(FILE_CHOSEN_X, FILE_CHOSEN_Y);
 		this.uploaded_documents_view_dimension = new Dimension(UPLOADED_DOCUMENTS_VIEW_X, UPLOADED_DOCUMENTS_VIEW_Y);
@@ -227,7 +238,7 @@ public class UploadJFrame extends JFrame {
 		this.main_icon = new ImageIcon(MAIN_ICON_PATH);
 		
 		this.main_layout = new FlowLayout();
-	
+
 		//Initialize borders
 		downloaded_documents_view_border = BorderFactory.createTitledBorder(DOWNLOADED_DOCUMENTS_BORDER_TEXT);
 		uploaded_documents_view_border = BorderFactory.createTitledBorder(UPLOADED_DOCUMENTS_BORDER_TEXT);
@@ -262,8 +273,13 @@ public class UploadJFrame extends JFrame {
 		//Settings of the documents panel
 		documents_panel.setPreferredSize(documents_panel_dimension);
 		
+		//Settings of the file chosen panel
+		file_chosen_panel.setPreferredSize(file_chosen_panel_dimension);
+		file_chosen_label.setHorizontalAlignment(SwingConstants.CENTER);
+		
 		//Settings of the options panel
 		options_panel.setPreferredSize(options_panel_dimension);				
+
 		file_chosen_label.setPreferredSize(file_chosen_label_dimension);
 		
 		//Adding elements to the title panel
@@ -276,6 +292,9 @@ public class UploadJFrame extends JFrame {
 		//Adding elements to the options panel
 		file_chosen_panel.add(file_chosen_label);
 		
+		//Adding element to the file_chosen_panel
+		file_chosen_panel.add(file_chosen_label);
+		
 		//Adding elements to the options panel
 		options_panel.add(choose_button);
 		options_panel.add(download_button);
@@ -284,6 +303,7 @@ public class UploadJFrame extends JFrame {
 		//Adding elements to the interface
 		this.add(title_panel);
 		this.add(documents_panel);
+		this.add(file_chosen_panel);
 		this.add(options_panel);
 		this.add(file_chosen_panel);
 		
@@ -298,7 +318,7 @@ public class UploadJFrame extends JFrame {
 	}
 
 	/**
-     * addListeners() permits to add all the listeners for the interface
+     * To add all the listeners for the interface
      */
 	private void addListeners() {
 		//Adding a listener for the choose button
@@ -313,6 +333,7 @@ public class UploadJFrame extends JFrame {
 				fc.showOpenDialog(choose_button);
 				
 				//Processing on the selected file
+
 				last_chosen_file = fc.getSelectedFile();
 				if(last_chosen_file != null && last_chosen_file.exists()) {
 					String selected_file_path = last_chosen_file.getAbsolutePath();
@@ -326,19 +347,7 @@ public class UploadJFrame extends JFrame {
 				}
 			}			
 		});
-//		JFileChooser fc = new JFileChooser();
-//
-//		//Adding a listener for the choose button
-//		choose_button.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				System.out.println("Choosing file ...");
-//
-//				fc.setMultiSelectionEnabled(CAN_SELECT_MULTIPLE_DOCUMENTS);
-//				
-//				fc.showOpenDialog(choose_button);
-//			}			
-//		});
+
 		
 		//Adding a listener for the download button
 		download_button.addActionListener(new ActionListener() {
@@ -390,9 +399,7 @@ public class UploadJFrame extends JFrame {
 				}
 			}
 		});
-			
 
-		
 		
 		//Adding a listener for the upload button
 		upload_button.addActionListener(new ActionListener() {

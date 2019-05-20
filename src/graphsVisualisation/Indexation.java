@@ -35,12 +35,12 @@ public class Indexation {
     private static final String FIELD_CONTENTS = "contents";
 
     public static void createIndex() throws CorruptIndexException, LockObtainFailedException,IOException{
-       Analyzer analyzer = new StandardAnalyzer();
-       boolean recreatedIndexIfExists = true;
-       IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
-       File dir = new File(FILES_TO_INDEX_DIRECTORY);
-       File[] files = dir.listFiles();
-        if (files != null) {
+    	Analyzer analyzer = new StandardAnalyzer();
+    	boolean recreatedIndexIfExists = true;
+    	IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
+    	File dir = new File(FILES_TO_INDEX_DIRECTORY);
+    	File[] files = dir.listFiles();
+    	if (files != null) {
             for(File file : files){
                 Document document = new Document();
                 String path = file.getCanonicalPath();
@@ -51,7 +51,7 @@ public class Indexation {
             }
         }
         indexWriter.optimize();
-       indexWriter.close();
+        indexWriter.close();
    }
 
    @SuppressWarnings("unchecked")
@@ -74,10 +74,7 @@ public static void searchIndex(String searchString) throws IOException, ParseExc
                String path = document.get(FIELD_PATH);
                System.out.println("Hit : " + path);
            }
-
        }
-	  
-
    }
 
    public static void pdfToText(String docName){
