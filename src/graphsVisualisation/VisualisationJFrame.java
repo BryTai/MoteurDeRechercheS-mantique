@@ -538,7 +538,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	private DefaultListModel<String> orderListModel(DefaultListModel<String> list_model){
 		//Sorting in alphabetical order
 		ArrayList<String> list = new ArrayList<>();
-		for (int i = 0; i < list_model.size(); i++) {
+		for (int i = 0; i < list_model.size(); i++) { 
 			list.add(list_model.get(i));
 		}
 		Collections.sort(list);

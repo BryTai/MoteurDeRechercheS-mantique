@@ -384,6 +384,8 @@ public class UploadJFrame extends JFrame {
 								System.out.println(dest.toString());
 								Files.copy(last_chosen_file.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
 								success_dialog = new SuccessDialog(upload_frame, DOWNLOAD_SUCCESS);
+								
+								downloaded_documents_list.updateUI();
 							} catch (IOException e1) {
 								e1.printStackTrace();
 								error_dialog = new ErrorDialog(upload_frame, DOWNLOAD_FAILURE);
@@ -415,6 +417,7 @@ public class UploadJFrame extends JFrame {
 					
 					Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
 					Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
+					uploaded_documents_list.updateUI();
 				}catch(Exception e2) {
 					e2.printStackTrace();
 					error_dialog = new ErrorDialog(upload_frame, NO_FILE_SELECTED);
