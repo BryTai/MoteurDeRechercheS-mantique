@@ -5,14 +5,13 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -20,14 +19,14 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -62,9 +61,6 @@ public class UploadJFrame extends JFrame {
     private final String MAIN_ICON_PATH = "ressources/logo.png";
     protected final String DOWNLOADED_DOCUMENTS_PATH = "downloaded docs";
 	private final String UPLOADED_DOCUMENTS_PATH = "uploaded docs";
-    
-    //Constants for the JTree
-    private final String ROOT_NODE_NAME = "Documents";
     
 	//Constants for the font
     private final String TITLE_FONT = "Georgia";
@@ -118,6 +114,9 @@ public class UploadJFrame extends JFrame {
     private final String DOWNLOADED_DOCUMENTS_BORDER_TEXT = "Fichiers téléchargés";
     private final String UPLOADED_DOCUMENTS_BORDER_TEXT = "Fichiers uploadés";
     
+    //Constants for the menu
+    private final String REMOVE_MENU_ITEM_NAME = "Supprimer";
+    
     //Main interface
     @SuppressWarnings("unused")
 	private VisualisationJFrame main_frame;
@@ -125,7 +124,6 @@ public class UploadJFrame extends JFrame {
     //Upload interface
     private UploadJFrame upload_frame;
 
-    
     //JButtons
     private JButton choose_button;
     private JButton download_button;
@@ -176,8 +174,9 @@ public class UploadJFrame extends JFrame {
 	private FileSystemModel upload_file_system_model;
 	private FileSystemModel download_file_system_model;
 	
-	//TreeFile
+	//File
 	private File last_chosen_file;
+	private File file_to_delete;
 	
 	//Dialogs
 	private AlertDialog alert_dialog;
@@ -186,8 +185,11 @@ public class UploadJFrame extends JFrame {
 	@SuppressWarnings("unused")
 	private ErrorDialog error_dialog;
 	
-	//Files
-	private File chosen_file;
+	//JPopupMenus
+	private JPopupMenu list_menu;
+	
+	//JMenuItems
+	private JMenuItem remove_menu_item;
 	
 	/**
 	 * Main constructor
@@ -267,6 +269,10 @@ public class UploadJFrame extends JFrame {
 		//Settings of the title panel
 		title_panel.setPreferredSize(title_panel_dimension);
 		
+		title_label.setFont(title_font);
+		title_label.setPreferredSize(title_label_dimension);
+		title_label.setHorizontalAlignment(SwingConstants.CENTER);
+		
 		//Adding elements to the title panel
 		title_panel.add(title_label);
 		
@@ -309,6 +315,7 @@ public class UploadJFrame extends JFrame {
 		
 		//Settings of the interface
 		this.setLayout(main_layout);
+		this.createMenu();
 		this.addListeners();
 		this.setResizable(IS_RESIZABLE);
 		this.setSize(WIDTH, HEIGHT);
@@ -317,6 +324,30 @@ public class UploadJFrame extends JFrame {
 		this.setVisible(IS_VISIBLE);
 	}
 
+	/**
+	 * To delete a document
+	 * @param file_to_delete: the file to delete
+	 */
+	private boolean deleteDocument(File file_to_delete) {
+		if(file_to_delete != null) {
+			if(file_to_delete.exists() && file_to_delete.isFile()) {
+				return file_to_delete.delete();
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * To create the menu that is displayed when the user right-clicked
+	 * on an element of the upload/download list
+	 */
+	private void createMenu() {
+		list_menu = new JPopupMenu();
+		remove_menu_item = new JMenuItem(REMOVE_MENU_ITEM_NAME);
+		
+		list_menu.add(remove_menu_item);
+	}
+	
 	/**
      * To add all the listeners for the interface
      */
@@ -381,13 +412,12 @@ public class UploadJFrame extends JFrame {
 						if(download_dir.canWrite()) {
 							try {
 								Path dest = new File(DOWNLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
-								System.out.println(dest.toString());
 								Files.copy(last_chosen_file.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
 								success_dialog = new SuccessDialog(upload_frame, DOWNLOAD_SUCCESS);
 								
+								//Refresh the interface
 								downloaded_documents_list.updateUI();
 							} catch (IOException e1) {
-								e1.printStackTrace();
 								error_dialog = new ErrorDialog(upload_frame, DOWNLOAD_FAILURE);
 							}
 						}else {
@@ -415,34 +445,71 @@ public class UploadJFrame extends JFrame {
 						upload_directory.mkdir();
 					}
 					
-					Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
-					Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
-					uploaded_documents_list.updateUI();
+					//If we can write on the upload directory
+					if(upload_directory.canWrite()) {
+						Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
+						Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
+						uploaded_documents_list.updateUI();
+					}else {
+						//If we can't write on the upload directory
+						error_dialog = new ErrorDialog(upload_frame, NO_WRITING_PERMISSION);
+					}
 				}catch(Exception e2) {
-					e2.printStackTrace();
 					error_dialog = new ErrorDialog(upload_frame, NO_FILE_SELECTED);
 				}
-				//TODO A changer (bouton upload)
-				System.out.println("Uploading document...");
 			}			
 		});
 		
-		//Adding a listener for the last selected element of the download list
-		downloaded_documents_list.addTreeSelectionListener(new TreeSelectionListener() {
+		//Adding a listener to remove a document by right click on an
+		//element of the download list
+		downloaded_documents_list.addMouseListener(new MouseAdapter() {
 			@Override
-			public void valueChanged(TreeSelectionEvent e) {
+			public void mouseClicked(MouseEvent e) {
+			    if (SwingUtilities.isRightMouseButton(e)) {
+			    	//Get the selected element with the right click
+			    	int row = downloaded_documents_list.getClosestRowForLocation(e.getX(), e.getY());
+			    	downloaded_documents_list.setSelectionRow(row);
+			        file_to_delete = (File) downloaded_documents_list.getLastSelectedPathComponent();
+			    	System.out.println(file_to_delete.getName());
+			        
+			    	//To show the menu
+			    	list_menu.show(e.getComponent(), e.getX(), e.getY());
+			    }
 			}
 		});
 		
-		//Adding a listener for the last selected element of the upload list
-		uploaded_documents_list.addTreeSelectionListener(new TreeSelectionListener() {
+		//Adding a listener to remove a document by right click on an
+		//element of the upload list
+		uploaded_documents_list.addMouseListener(new MouseAdapter() {
 			@Override
-			public void valueChanged(TreeSelectionEvent e) {
+			public void mouseClicked(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+			    	//Get the selected element with the right click
+			    	int row = uploaded_documents_list.getClosestRowForLocation(e.getX(), e.getY());
+			    	uploaded_documents_list.setSelectionRow(row);
+			        file_to_delete = (File) uploaded_documents_list.getLastSelectedPathComponent();
+			    	System.out.println(file_to_delete.getName());
+			        
+			    	//To show the menu
+			    	list_menu.show(e.getComponent(), e.getX(), e.getY());
+			    }
+			}
+		});
+		
+		//Adding a listener to react when the user click to delete the file
+		remove_menu_item.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean was_deleted = deleteDocument(file_to_delete);
+				if(was_deleted) {
+					//Reloading both lists if the file was deleted
+					downloaded_documents_list.updateUI();
+					uploaded_documents_list.updateUI();
+				}
 			}
 		});
 	}
 	
-		
 		/**
 		 * To get the last chosen file on both lists (upload & download lists)
 		 * @return the TreeFile, null if nothing was selected
