@@ -1,12 +1,16 @@
 package graphsVisualisation;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -14,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -21,7 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  * The class UploadJFrame is an extension of the class JFrame that
@@ -41,16 +46,21 @@ public class UploadJFrame extends JFrame {
 	//Constants for title panel
 	private final String TITLE_LABEL_NAME = "Upload de documents";
     private final byte TITLE_SIZE = 25;
+    
+    //Constants for the labels
+    private final String FILE_CHOSEN_PREFIX = "Fichier choisi : ";
+    private final String NO_FILE_CHOSEN = "Aucun fichier choisi !";
+    private final byte FILE_CHOSEN_MAX_LENGTH = 50;
 	
     //Constants for the buttons
+    private final String DOWNLOAD_BUTTON_TEXT = "Download !";
     private final String UPLOAD_BUTTON_TEXT = "Upload !";
     private final String CHOOSE_BUTTON_TEXT = "Choisir fichier !";
     
-    //Constants for the colors
-    private final Color DOCUMENTS_PANEL_BORDER_COLOR = Color.GRAY;
-    
-    //Constants for the icons
+    //Constants for the paths
     private final String MAIN_ICON_PATH = "ressources/logo.png";
+    protected final String DOWNLOADED_DOCUMENTS_PATH = "downloaded docs";
+	private final String UPLOADED_DOCUMENTS_PATH = "uploaded docs";
     
     //Constants for the JTree
     private final String ROOT_NODE_NAME = "Documents";
@@ -62,17 +72,39 @@ public class UploadJFrame extends JFrame {
     private final short TITLE_PANEL_X = WIDTH-2;
     private final short TITLE_PANEL_Y = HEIGHT/10;
     
-    private final short DOCUMENTS_PANEL_X = TITLE_PANEL_X-1;
+    private final short DOCUMENTS_PANEL_X = TITLE_PANEL_X-15;
     private final short DOCUMENTS_PANEL_Y = 7*HEIGHT/10;
     
-    private final short OPTIONS_PANEL_X = WIDTH-2;
-    private final short OPTIONS_PANEL_Y = HEIGHT/10;
+    private final short OPTIONS_PANEL_X = DOCUMENTS_PANEL_X;
+    private final short OPTIONS_PANEL_Y = HEIGHT/20;
+    
+    private final short FILE_CHOSEN_PANEL_X = DOCUMENTS_PANEL_Y;
+    private final short FILE_CHOSEN_PANEL_Y = HEIGHT/20;
+    
+    private final short FILE_CHOSEN_X = OPTIONS_PANEL_X-100;
+    private final short FILE_CHOSEN_Y = (OPTIONS_PANEL_Y-10)/2;
     
     private final short TITLE_LABEL_X = TITLE_PANEL_X*3/4;
     private final short TITLE_LABEL_Y = TITLE_PANEL_Y-2;
     
     private final short DOCUMENTS_VIEW_X = DOCUMENTS_PANEL_X;
     private final short DOCUMENTS_VIEW_Y = DOCUMENTS_PANEL_Y-11;
+    
+    private final short UPLOADED_DOCUMENTS_VIEW_X = (DOCUMENTS_VIEW_X-100)/2;
+    private final short UPLOADED_DOCUMENTS_VIEW_Y = DOCUMENTS_VIEW_Y;
+    
+    private final short DOWNLOADED_DOCUMENTS_VIEW_X = (DOCUMENTS_VIEW_X-100)/2;
+    private final short DOWNLOADED_DOCUMENTS_VIEW_Y = DOCUMENTS_VIEW_Y;
+    
+    //Constants for the message for the Dialogs
+    private final String NO_FILE_SELECTED = "Aucun fichier n'a été choisi !";
+    private final String IS_NOT_A_FILE = "L'élément sélectionné n'est pas un fichier !";
+    private final String DOWNLOAD_FILE_REPLACEMENT = "Le fichier existe déjà, voulez-vous le remplacer ?";
+    private final String DOWNLOAD_SUCCESS = "Le fichier a correctement été téléchargé !";
+    private final String UPLOAD_SUCCESS = "Le fichier a correctement été uploadé !";
+    private final String DOWNLOAD_FAILURE = "Le fichier n'a pas été téléchargé !";
+    private final String UPLOAD_FAILURE = "Le fichier n'a pas été uploadé !";
+    private final String NO_WRITING_PERMISSION = "Impossible d'écrire dans le répertoire ciblé !";
     
     //Constants for the layouts
     private final byte OPTIONS_PANEL_LAYOUT_COL = 1;
@@ -81,68 +113,105 @@ public class UploadJFrame extends JFrame {
     //Constants for the file chooser
     private final boolean CAN_SELECT_MULTIPLE_DOCUMENTS = false;
     
+    //Constants for the text of the borders
+    private final String DOWNLOADED_DOCUMENTS_BORDER_TEXT = "Fichiers téléchargés";
+    private final String UPLOADED_DOCUMENTS_BORDER_TEXT = "Fichiers uploadés";
+    
     //Main interface
     @SuppressWarnings("unused")
 	private VisualisationJFrame main_frame;
     
+    //Upload interface
+    private UploadJFrame upload_frame;
+    
     //JButtons
     private JButton choose_button;
+    private JButton download_button;
     private JButton upload_button;
     
 	//JPanels
 	private JPanel title_panel;
 	private JPanel documents_panel;
 	private JPanel options_panel;
+	private JPanel file_chosen_panel;
 	
 	//JScrollPanes
-	private JScrollPane documents_view;
-	
-	//DefaultListModel
-	private DefaultMutableTreeNode documents_view_node;
+	private JScrollPane uploaded_documents_view;
+	private JScrollPane downloaded_documents_view;
 	
 	//JTree
-	private JTree documents_list;
+	private JTree uploaded_documents_list;
+	private JTree downloaded_documents_list;
 	
 	//JLabels
 	private JLabel title_label;
+	private JLabel file_chosen_label;
 	
 	//Fonts
 	private Font title_font;
 	
 	//Borders
-	private Border documents_panel_border;
+	private Border downloaded_documents_view_border;
+	private Border uploaded_documents_view_border;
 	
 	//Dimension
 	private Dimension title_label_dimension;
-	private Dimension documents_view_dimension;
+	private Dimension downloaded_documents_view_dimension;
+	private Dimension uploaded_documents_view_dimension;
 	private Dimension title_panel_dimension;
 	private Dimension documents_panel_dimension;
 	private Dimension options_panel_dimension;
+	private Dimension file_chosen_panel_dimension;
+	private Dimension file_chosen_label_dimension;
 	
 	//Icons
 	private ImageIcon main_icon;
 	
 	//Layouts
 	private FlowLayout main_layout;
-	private GridLayout options_panel_layout;
+	
+	//FileSystemModel
+	private FileSystemModel upload_file_system_model;
+	private FileSystemModel download_file_system_model;
+	
+	//TreeFile
+	private File last_chosen_file;
+	
+	//Dialogs
+	private AlertDialog alert_dialog;
+	@SuppressWarnings("unused")
+	private SuccessDialog success_dialog;
+	@SuppressWarnings("unused")
+	private ErrorDialog error_dialog;
+
 	
 	public UploadJFrame(VisualisationJFrame main_frame) {
 		//Initialization
 		this.main_frame = main_frame;
 		
+		this.upload_frame = this;
+		
 		this.title_panel = new JPanel();
 		this.documents_panel = new JPanel(); 
+		this.file_chosen_panel = new JPanel();
 		this.options_panel = new JPanel();
 		
-		this.documents_view_node = new DefaultMutableTreeNode(ROOT_NODE_NAME);
-		this.addDocuments();
-		this.documents_list = new JTree(documents_view_node);
-		this.documents_view = new JScrollPane(documents_list);
+		//this.uploaded_documents_node = new DefaultMutableTreeNode(UPLOAD_NODE_NAME);
+		this.upload_file_system_model = new FileSystemModel(new File(UPLOADED_DOCUMENTS_PATH));
+		this.uploaded_documents_list = new JTree(upload_file_system_model);
+		this.uploaded_documents_view = new JScrollPane(uploaded_documents_list);
+		
+		//this.downloaded_documents_node = new DefaultMutableTreeNode(DOWNLOAD_NODE_NAME);
+		this.download_file_system_model = new FileSystemModel(new File(DOWNLOADED_DOCUMENTS_PATH));
+		this.downloaded_documents_list = new JTree(download_file_system_model);
+		this.downloaded_documents_view = new JScrollPane(downloaded_documents_list);
 		
 		this.choose_button = new JButton(CHOOSE_BUTTON_TEXT);
+		this.download_button = new JButton(DOWNLOAD_BUTTON_TEXT);
 		this.upload_button = new JButton(UPLOAD_BUTTON_TEXT);
 		
 		this.title_label = new JLabel(TITLE_LABEL_NAME);
+		this.file_chosen_label = new JLabel(FILE_CHOSEN_PREFIX + NO_FILE_CHOSEN);
 		
 		this.title_font = new Font(TITLE_FONT, Font.PLAIN, TITLE_SIZE);
 		
@@ -150,49 +219,73 @@ public class UploadJFrame extends JFrame {
 		this.title_panel_dimension = new Dimension(TITLE_PANEL_X, TITLE_PANEL_Y);
 		this.documents_panel_dimension = new Dimension(DOCUMENTS_PANEL_X, DOCUMENTS_PANEL_Y);
 		this.options_panel_dimension = new Dimension(OPTIONS_PANEL_X, OPTIONS_PANEL_Y);
-		this.documents_view_dimension = new Dimension(DOCUMENTS_VIEW_X, DOCUMENTS_VIEW_Y);
+		this.file_chosen_panel_dimension = new Dimension(FILE_CHOSEN_PANEL_X, FILE_CHOSEN_PANEL_Y);
+		this.file_chosen_label_dimension = new Dimension(FILE_CHOSEN_X, FILE_CHOSEN_Y);
+		this.uploaded_documents_view_dimension = new Dimension(UPLOADED_DOCUMENTS_VIEW_X, UPLOADED_DOCUMENTS_VIEW_Y);
+		this.downloaded_documents_view_dimension = new Dimension(DOWNLOADED_DOCUMENTS_VIEW_X, DOWNLOADED_DOCUMENTS_VIEW_Y);
 		
 		this.main_icon = new ImageIcon(MAIN_ICON_PATH);
 		
 		this.main_layout = new FlowLayout();
-		this.options_panel_layout = new GridLayout(OPTIONS_PANEL_LAYOUT_ROW, OPTIONS_PANEL_LAYOUT_COL);
-		
+	
 		//Initialize borders
-		this.documents_panel_border = BorderFactory.createLineBorder(DOCUMENTS_PANEL_BORDER_COLOR);
+		downloaded_documents_view_border = BorderFactory.createTitledBorder(DOWNLOADED_DOCUMENTS_BORDER_TEXT);
+		uploaded_documents_view_border = BorderFactory.createTitledBorder(UPLOADED_DOCUMENTS_BORDER_TEXT);
+		
+		//Settings of the lists
+		uploaded_documents_list.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		
+		downloaded_documents_list.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+		uploaded_documents_view.setPreferredSize(uploaded_documents_view_dimension);
+		uploaded_documents_view.setBorder(uploaded_documents_view_border);
+		
+		downloaded_documents_view.setPreferredSize(downloaded_documents_view_dimension);
+		downloaded_documents_view.setBorder(downloaded_documents_view_border);
 		
 		//Settings of the title label
-		title_label.setFont(title_font);
-		title_label.setHorizontalAlignment(SwingConstants.CENTER);
-		title_label.setPreferredSize(title_label_dimension);
+		title_panel.setPreferredSize(title_panel_dimension);
 		
 		//Settings of the documents scrollpane
-		documents_view.setPreferredSize(documents_view_dimension);
+		documents_panel.setPreferredSize(documents_panel_dimension);
+		
+		//Settings of the file chosen panel
+		file_chosen_panel.setPreferredSize(file_chosen_panel_dimension);
+		file_chosen_label.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		//Settings of the title panel
 		title_panel.setPreferredSize(title_panel_dimension);
 		
+		//Adding elements to the title panel
+		title_panel.add(title_label);
+		
 		//Settings of the documents panel
 		documents_panel.setPreferredSize(documents_panel_dimension);
-		documents_panel.setBorder(documents_panel_border);
 		
 		//Settings of the options panel
-		options_panel.setPreferredSize(options_panel_dimension);
+		options_panel.setPreferredSize(options_panel_dimension);				
+		file_chosen_label.setPreferredSize(file_chosen_label_dimension);
 		
 		//Adding elements to the title panel
 		title_panel.add(title_label);
 		
 		//Adding elements to the documents panel
-		documents_panel.add(documents_view);
+		documents_panel.add(uploaded_documents_view);
+		documents_panel.add(downloaded_documents_view);	
+		
+		//Adding elements to the options panel
+		file_chosen_panel.add(file_chosen_label);
 		
 		//Adding elements to the options panel
 		options_panel.add(choose_button);
+		options_panel.add(download_button);
 		options_panel.add(upload_button);
-		options_panel.setLayout(options_panel_layout);
 		
 		//Adding elements to the interface
 		this.add(title_panel);
 		this.add(documents_panel);
 		this.add(options_panel);
+		this.add(file_chosen_panel);
 		
 		//Settings of the interface
 		this.setLayout(main_layout);
@@ -200,21 +293,10 @@ public class UploadJFrame extends JFrame {
 		this.setResizable(IS_RESIZABLE);
 		this.setSize(WIDTH, HEIGHT);
 		this.setIconImage(main_icon.getImage());
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setTitle(FRAME_NAME);
 		this.setVisible(IS_VISIBLE);
 	}
-	
-	/**
-	 * addDocuments() permits to add documents to the list that the
-	 * user has chosen previously
-	 */
-	private void addDocuments() {
-		for(byte i=1; i<=30; i++) {
-			documents_view_node.add(new DefaultMutableTreeNode("Test"+Integer.toString(i)));
-		}
-	}
-	
+
 	/**
      * addListeners() permits to add all the listeners for the interface
      */
@@ -225,28 +307,158 @@ public class UploadJFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Choosing file ...");
 				
+				//Selection of the file to upload
 				JFileChooser fc = new JFileChooser();
 				fc.setMultiSelectionEnabled(CAN_SELECT_MULTIPLE_DOCUMENTS);
-				
 				fc.showOpenDialog(choose_button);
+				
+				//Processing on the selected file
+				last_chosen_file = fc.getSelectedFile();
+				if(last_chosen_file != null && last_chosen_file.exists()) {
+					String selected_file_path = last_chosen_file.getAbsolutePath();
+					String printable_path = selected_file_path;
+					
+					//Get a shorter version of the path if it's too long for the label !
+					if(selected_file_path.length() > FILE_CHOSEN_MAX_LENGTH) {
+						printable_path = selected_file_path.substring(selected_file_path.length()-FILE_CHOSEN_MAX_LENGTH, selected_file_path.length());
+					}
+					file_chosen_label.setText(FILE_CHOSEN_PREFIX + "(...) " + printable_path);
+				}
 			}			
 		});
+//		JFileChooser fc = new JFileChooser();
+//
+//		//Adding a listener for the choose button
+//		choose_button.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				System.out.println("Choosing file ...");
+//
+//				fc.setMultiSelectionEnabled(CAN_SELECT_MULTIPLE_DOCUMENTS);
+//				
+//				fc.showOpenDialog(choose_button);
+//			}			
+//		});
+		
+		//Adding a listener for the download button
+		download_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				File download_directory = new File(DOWNLOADED_DOCUMENTS_PATH);
+				
+				//Creates the repository if it doesn't exist
+				if(!download_directory.exists()) {
+					download_directory.mkdir();
+				}
+				
+				//Set the chosen file by getting the last clicked element on the upload list
+				try{
+					last_chosen_file = (File) uploaded_documents_list.getLastSelectedPathComponent();
+				}catch(Exception e2) {
+					error_dialog = new ErrorDialog(upload_frame, NO_FILE_SELECTED);
+				}
+				
+				//TODO search if the file already exists in the download directory
+				
+				//Test the validity of the file chosen
+				if(last_chosen_file == null) {
+					error_dialog = new ErrorDialog(upload_frame, NO_FILE_SELECTED);						
+				}else {	
+					File download_dir = new File(DOWNLOADED_DOCUMENTS_PATH);
+					
+					//If the last chosen file is a file
+					if(last_chosen_file.isFile()) {
+						//If we can write on the download directory
+						if(download_dir.canWrite()) {
+							try {
+								Path dest = new File(DOWNLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
+								System.out.println(dest.toString());
+								Files.copy(last_chosen_file.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
+								success_dialog = new SuccessDialog(upload_frame, DOWNLOAD_SUCCESS);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+								error_dialog = new ErrorDialog(upload_frame, DOWNLOAD_FAILURE);
+							}
+						}else {
+							//If we can't write on the download directory
+							error_dialog = new ErrorDialog(upload_frame, NO_WRITING_PERMISSION);
+						}
+					}else {
+						//If the last chosen file is a directory
+						error_dialog = new ErrorDialog(upload_frame, IS_NOT_A_FILE);
+					}
+				}
+			}
+		});
+			
+
+		
 		
 		//Adding a listener for the upload button
 		upload_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				try{
+					File upload_directory = new File(UPLOADED_DOCUMENTS_PATH);
+					
+					//Creates the repository if it doesn't exist
+					if(!upload_directory.exists()) {
+						upload_directory.mkdir();
+					}
+					
+					Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
+					Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
+				}catch(Exception e2) {
+					e2.printStackTrace();
+					error_dialog = new ErrorDialog(upload_frame, NO_FILE_SELECTED);
+				}
 				//TODO A changer (bouton upload)
-				System.out.println("Uploading document(s)...");
+				System.out.println("Uploading document...");
 			}			
 		});
 		
-		//Adding a listener for the last selection element of the list
-		documents_list.addTreeSelectionListener(new TreeSelectionListener() {
+		//Adding a listener for the last selected element of the download list
+		downloaded_documents_list.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
-				System.out.println("Document clicked !");				
+			}
+		});
+		
+		//Adding a listener for the last selected element of the upload list
+		uploaded_documents_list.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
 			}
 		});
 	}
-}
+	
+		
+		/**
+		 * To get the last chosen file on both lists (upload & download lists)
+		 * @return the TreeFile, null if nothing was selected
+		 */
+		public File getLastChosenFile() {
+			return last_chosen_file;
+		}
+		
+		/**
+		 * To test if a file is contained in a directory
+		 * @param base : The directory to search in
+		 * @param child : The file to compare
+		 * @return true if the file exists in the (sub)directories, false otherwise
+		 * @throws IOException
+		 */
+		public boolean isSubDirectory(File base, File child) throws IOException {
+			    base = base.getCanonicalFile();
+			    child = child.getCanonicalFile();
+
+			    File parentFile = child;
+			    while (parentFile != null) {
+			        if (base.equals(parentFile)) {
+			            return true;
+			        }
+			        parentFile = parentFile.getParentFile();
+			    }
+			    return false;
+			}
+	}
