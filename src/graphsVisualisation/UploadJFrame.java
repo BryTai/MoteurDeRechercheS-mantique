@@ -33,6 +33,7 @@ import javax.swing.tree.TreeSelectionModel;
 /**
  * An interface to help the user choosing the documents that he has to upload
  */
+@SuppressWarnings("unused")
 public class UploadJFrame extends JFrame {
 	private static final long serialVersionUID = -7498139402373436629L;
 	
@@ -62,9 +63,6 @@ public class UploadJFrame extends JFrame {
     private final String MAIN_ICON_PATH = "ressources/logo.png";
     protected final String DOWNLOADED_DOCUMENTS_PATH = "downloaded docs";
 	private final String UPLOADED_DOCUMENTS_PATH = "uploaded docs";
-    
-    //Constants for the JTree
-    private final String ROOT_NODE_NAME = "Documents";
     
 	//Constants for the font
     private final String TITLE_FONT = "Georgia";
@@ -119,7 +117,6 @@ public class UploadJFrame extends JFrame {
     private final String UPLOADED_DOCUMENTS_BORDER_TEXT = "Fichiers uploadés";
     
     //Main interface
-    @SuppressWarnings("unused")
 	private VisualisationJFrame main_frame;
     
     //Upload interface
@@ -181,9 +178,7 @@ public class UploadJFrame extends JFrame {
 	
 	//Dialogs
 	private AlertDialog alert_dialog;
-	@SuppressWarnings("unused")
 	private SuccessDialog success_dialog;
-	@SuppressWarnings("unused")
 	private ErrorDialog error_dialog;
 	
 	//Files
