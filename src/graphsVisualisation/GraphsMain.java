@@ -10,13 +10,10 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 
-/**
- * The class GraphsMain is the entry point of the program
- */
 @SuppressWarnings("unused")
 public class GraphsMain {
 	/**
-	 * main() is the main method of the program
+	 * The entry point of the program
 	 * @param args: Arguments of the main method
 	 */
 	public static void main(String[] args) {
@@ -25,28 +22,11 @@ public class GraphsMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		new VisualisationJFrame();
-	
-		//new UploadJFrame();
+		ParserOnto parser = new ParserOnto("./ressources//clean_data.json");
+		HashMap<String, Concept> cpt = parser.lesConcepts();
+		HashMap<String, Terme> term = parser.lesTermes(cpt);
+		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
+		new VisualisationJFrame(cpt, term, cpt_term);
 		
-//		try {
-//			//Error Initialize
-//			ParserOnto parser = new ParserOnto("./ressources//clean_data.json");
-//			//System.out.println(parser.toString());
-//			//HashMap<String, Concept> lesCpts = parser.lesConcepts();
-//			//HashMap<String, Terme> lestrm = parser.lesTermes(lesCpts);
-//			HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
-//			for(Entry<String, ArrayList<String>> cptTerm : cpt_term.entrySet()) {
-//				System.out.print(cptTerm.getKey() +" --> "+cptTerm.getValue().toString() +"\n");
-//			}
-//			
-//			
-//			//System.out.println("Les concepts :" + lesCpts.toString());
-//			//System.out.println("Les termes :" + lestrm.toString());
-//		
-//		}catch (Exception e ){
-//			e.printStackTrace();
-//		}		
 	}
 }

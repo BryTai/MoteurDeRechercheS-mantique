@@ -8,8 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * The class OptionsManager permits to manage every option of the interface, for example
- * the animation of the title when the interface launches.
+ * To manage every option of the interface, for example the animation of
+ * the title when the interface launches.
  */
 public class OptionsManager {
 	//The main frame
@@ -29,8 +29,9 @@ public class OptionsManager {
 	private final boolean APPEND_TO_FILE = true;
 	private final boolean OVERWRITE_FILE = false;
 	private final String OPTIONS_FILE_PATH = "ressources/options.txt";
-	private final String FILE_EXISTING_ERROR = "Erreur, le fichier pour les options n'existe pas !";
-	
+	private final String FILE_READING_ERROR = "Impossible de lire le fichier pour les options !";
+	private final String FILE_WRITING_ERROR = "Impossible d'écrire dans le fichier pour les options !";
+
 	/**
 	 * OptionsManager() is the main constructor of this class.
 	 * @param f: The main interface
@@ -44,7 +45,7 @@ public class OptionsManager {
 				this.fr = new FileReader(options_file);
 				this.fw = new FileWriter(options_file, APPEND_TO_FILE);
 			}else {
-				System.err.println(FILE_EXISTING_ERROR);
+				options_file.createNewFile();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -69,66 +70,74 @@ public class OptionsManager {
 	}
 
 	/**
-	 * getOptionsFromFile() permits to read all the options from the file 'options_file'
+	 * To read all the options from the file 'options_file'
 	 */
-	private void getOptionsFromFile() {
-		try {
-			String line;
-			int nb_line = 1;
+	private void getOptionsFromFile() {		
+		if(options_file.canRead()) {
+			try {
+				String line;
+				int nb_line = 1;
 			
-			while((line=br.readLine()) != null) {
+				while((line=br.readLine()) != null) {
 				
-				//Defining the options
-				switch(nb_line) {
-					//For the animation of the title label
-					case 1:
-						boolean b = line.trim().equals("true");
-						if(b) {
-							this.title_animation_enabled = true;
-							this.main_frame.setTitleAnimationState(true);
-						}else {
-							this.title_animation_enabled = false;
-							this.main_frame.setTitleAnimationState(false);
-						}
+					//Defining the options
+					switch(nb_line) {
+						//For the animation of the title label
+						case 1:
+							boolean b = line.trim().equals("true");
+							if(b) {
+								this.title_animation_enabled = true;
+								this.main_frame.setTitleAnimationState(true);
+							}else {
+								this.title_animation_enabled = false;
+								this.main_frame.setTitleAnimationState(false);
+							}
 						
-						break;	
-				}
+							break;	
+					}
 				
-				//For the next iteration of the loop
-				line = br.readLine();
-				nb_line++;
+					//For the next iteration of the loop
+					line = br.readLine();
+					nb_line++;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
-	}
-	
-	/**
-	 * saveOptions() permits to save the options of the interface in a file 
-	 */
-	protected void saveOptions() {	
-		try {
-			//Overwriting the file
-			this.fw = new FileWriter(options_file, OVERWRITE_FILE);
-			
-			//For the animation of the title label
-			if(title_animation_enabled) {
-				bw.write("true");
-				bw.newLine();
-				bw.flush();
-			}else {
-				bw.write("false");
-				bw.newLine();
-				bw.flush();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		}else {
+			System.err.println(FILE_READING_ERROR);
 		}
 	}
 	
 	/**
-	 * isTitleAnimationEnabled is a getter to access to the state of the option for
-	 * the animation title
+	 * To save the options of the interface in a file 
+	 */
+	protected void saveOptions() {	
+		//Creates the file if it doesn't exist
+		if(options_file.canWrite()) {		
+			try {
+				//Overwriting the file
+				this.fw = new FileWriter(options_file, OVERWRITE_FILE);
+			
+				//For the animation of the title label
+				if(title_animation_enabled) {
+					bw.write("true");
+					bw.newLine();
+					bw.flush();
+				}else {
+					bw.write("false");
+					bw.newLine();
+					bw.flush();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else {
+			System.err.println(FILE_WRITING_ERROR);
+		}
+	}
+	
+	/**
+	 * A getter to access to the state of the option for the animation title
 	 * @return boolean : The state of the option
 	 */
 	protected boolean isTitleAnimationEnabled() {
@@ -136,12 +145,10 @@ public class OptionsManager {
 	}
 
 	/**
-	 * setTitleAnimationEnabled is a setter to set the state of the option for
-	 * the animation title
+	 * A setter to set the state of the option for the animation title
 	 * @param is_enabled : The state of the option
 	 */
 	protected void setTitleAnimationEnabled(boolean is_enabled) {
 		this.title_animation_enabled = is_enabled;
 	}
-	
 }

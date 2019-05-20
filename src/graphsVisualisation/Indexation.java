@@ -37,12 +37,14 @@ public class Indexation {
 
 
     public static void createIndex() throws CorruptIndexException, LockObtainFailedException,IOException{
-        Analyzer analyzer = new StandardAnalyzer();
-        boolean recreatedIndexIfExists = true;
-        IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
-        File dir = new File(FILES_TO_INDEX_DIRECTORY);
-        File[] files = dir.listFiles();
-        if (files != null) {
+
+    	Analyzer analyzer = new StandardAnalyzer();
+    	boolean recreatedIndexIfExists = true;
+    	IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
+    	File dir = new File(FILES_TO_INDEX_DIRECTORY);
+    	File[] files = dir.listFiles();
+    	if (files != null) {
+
             for(File file : files){
                 Document document = new Document();
                 String path = file.getCanonicalPath();
@@ -54,30 +56,34 @@ public class Indexation {
         }
         indexWriter.optimize();
         indexWriter.close();
-    }
 
-    @SuppressWarnings("unchecked")
-    public static void searchIndex(String searchString) throws IOException, ParseException{
-        System.out.println("Rechercher : '" + searchString + "'");
-        Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY); 
-        IndexReader indexReader = IndexReader.open(directory);
-        IndexSearcher indexSearcher= new IndexSearcher(indexReader);
+   }
 
-        Analyzer analyzer = new StandardAnalyzer();
-        QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
-        Query query = queryParser.parse(searchString);
-        Hits hits = indexSearcher.search(query);
-        System.out.println("Number of hits: " + hits.length());
-        Iterator<Hit> it = hits.iterator();
-        while(it.hasNext()){
-            Hit hit = it.next();
-            Document document = hit.getDocument();
-            String path = document.get(FIELD_PATH);
-            System.out.println("Hit : " + path);
-        }
-    }
+   @SuppressWarnings("unchecked")
+public static void searchIndex(String searchString) throws IOException, ParseException{
+       if(!searchString.equals("")) {
+    	   System.out.println("Rechercher : '" + searchString + "'");
+           Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY);
+           IndexReader indexReader = IndexReader.open(directory);
+           IndexSearcher indexSearcher= new IndexSearcher(indexReader);
 
-    public static void pdfToText(String docName){
+           Analyzer analyzer = new StandardAnalyzer();
+           QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
+           Query query = queryParser.parse(searchString);
+           Hits hits = indexSearcher.search(query);
+           System.out.println("Number of hits: " + hits.length());
+           Iterator<Hit> it = hits.iterator();
+           while(it.hasNext()){
+               Hit hit = it.next();
+               Document document = hit.getDocument();
+               String path = document.get(FIELD_PATH);
+               System.out.println("Hit : " + path);
+           }
+       }
+   }
+
+   public static void pdfToText(String docName){
+
         File f = new File(FILES_TO_INDEX_DIRECTORY+ "/" + docName+".txt");
         if (f.exists()){
             System.out.println("Le fichier existe déjà!!!");
