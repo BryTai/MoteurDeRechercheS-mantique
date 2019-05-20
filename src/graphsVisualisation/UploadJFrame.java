@@ -126,8 +126,9 @@ public class UploadJFrame extends JFrame {
 
     //JButtons
     private JButton choose_button;
-    private JButton download_button;
     private JButton upload_button;
+    private JButton download_button;
+
     
 	//JPanels
 	private JPanel title_panel;
@@ -189,7 +190,7 @@ public class UploadJFrame extends JFrame {
 	//JMenuItems
 	private JMenuItem remove_menu_item;
 	
-	/**
+	/** 
 	 * Main constructor
 	 *@param main_frame: The main interface
 	 */
@@ -468,7 +469,7 @@ public class UploadJFrame extends JFrame {
 			    	int row = downloaded_documents_list.getClosestRowForLocation(e.getX(), e.getY());
 			    	downloaded_documents_list.setSelectionRow(row);
 			        file_to_delete = (File) downloaded_documents_list.getLastSelectedPathComponent();
-			    	System.out.println(file_to_delete.getName());
+			    	//System.out.println(file_to_delete.getName());
 			        
 			    	//To show the menu
 			    	list_menu.show(e.getComponent(), e.getX(), e.getY());
