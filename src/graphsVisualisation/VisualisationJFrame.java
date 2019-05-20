@@ -50,6 +50,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 @SuppressWarnings("unused")
 public class VisualisationJFrame extends JFrame implements ActionListener {
+
 	private static final long serialVersionUID = 4882815445311467209L;
 
 	// The main frame
@@ -281,6 +282,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	private HashMap<String, Concept> cpt;
 	private HashMap<String, Terme> term;
 	private HashMap<String, ArrayList<String>> cpt_term;
+
 	
 	/**
 	 * Main constructor of this class. This constructor creates all the interface.
@@ -536,7 +538,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	private DefaultListModel<String> orderListModel(DefaultListModel<String> list_model){
 		//Sorting in alphabetical order
 		ArrayList<String> list = new ArrayList<>();
-		for (int i = 0; i < list_model.size(); i++) {
+		for (int i = 0; i < list_model.size(); i++) { 
 			list.add(list_model.get(i));
 		}
 		Collections.sort(list);
@@ -548,6 +550,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 		return list_model;
 	}
 	
+
 	/**
 	 * Put the first letter of the string in uppercase
 	 * @param str: The string to capitalize
@@ -710,6 +713,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 
 		}
 
+
 	}
 
 	/**
@@ -821,6 +825,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 		return title_label_effect;
 	}
 
+
 	/**
 	 * To access to the class that manages the options of the interface
 	 * @return OptionsManager : an instance of the class that manages 
@@ -847,6 +852,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("quit")) {
 			main_window_closer.quit();
+
 		}
 	}
 }

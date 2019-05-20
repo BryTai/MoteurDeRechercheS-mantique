@@ -27,6 +27,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+
 @SuppressWarnings("deprecation")
 public class Indexation {
 	private static final String FILES_TO_INDEX_DIRECTORY = "ressources/fileToIndex";
@@ -34,13 +35,16 @@ public class Indexation {
     private static final String FIELD_PATH = "path";
     private static final String FIELD_CONTENTS = "contents";
 
+
     public static void createIndex() throws CorruptIndexException, LockObtainFailedException,IOException{
+
     	Analyzer analyzer = new StandardAnalyzer();
     	boolean recreatedIndexIfExists = true;
     	IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
     	File dir = new File(FILES_TO_INDEX_DIRECTORY);
     	File[] files = dir.listFiles();
     	if (files != null) {
+
             for(File file : files){
                 Document document = new Document();
                 String path = file.getCanonicalPath();
@@ -52,6 +56,7 @@ public class Indexation {
         }
         indexWriter.optimize();
         indexWriter.close();
+
    }
 
    @SuppressWarnings("unchecked")
@@ -78,6 +83,7 @@ public static void searchIndex(String searchString) throws IOException, ParseExc
    }
 
    public static void pdfToText(String docName){
+
         File f = new File(FILES_TO_INDEX_DIRECTORY+ "/" + docName+".txt");
         if (f.exists()){
             System.out.println("Le fichier existe déjà!!!");

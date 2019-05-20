@@ -17,12 +17,12 @@ public class ParserOnto {
 	//Constructeur
 	public ParserOnto() {
 		this.path = "";
-		this.setMyGson(new Gson());
+		this.myGson = new Gson();
 	}
 	
 	public ParserOnto(String path) {
-		this.setPath(path);
-		this.setMyGson(new Gson());
+		this.path = path;
+		this.myGson = new Gson();
 		try {
 			initialize();
 		}catch(IOException e) {
@@ -120,6 +120,7 @@ public class ParserOnto {
 	
 	//Parsing des termes dans un dictionnaire avec comme clé les id des termes et en value l'objet correspondant
 	HashMap<String, Terme> lesTermes(HashMap<String, Concept> dicoCPT){
+
 		//Le dictionnaire final
 		HashMap<String, Terme> dicoTerme = new HashMap<String, Terme>();
 		//Récupération de la langue
@@ -127,8 +128,6 @@ public class ParserOnto {
 		
 		//Ajout de chaque terme dans le dictionnaire
 		for(Entry<String, JsonElement> lg : langue.entrySet()) {
-			
-			
 			for(Entry<String, JsonElement> trm : langue.getAsJsonObject(lg.getKey()).entrySet()) {
 				Terme termeEnCours = new Terme();
 				termeEnCours = this.getMyGson().fromJson(trm.getValue(), Terme.class);

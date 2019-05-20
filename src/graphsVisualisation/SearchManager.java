@@ -3,6 +3,8 @@ package graphsVisualisation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
+
 /**
  * Manages the interactions between the search bar, the search button
  * and the results of the research that are printed on the interface.
@@ -34,7 +36,9 @@ public class SearchManager implements ActionListener {
 
 		try {
 			Indexation.searchIndex(search_bar_content);
+
 		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
 		System.out.println(search_bar_content);

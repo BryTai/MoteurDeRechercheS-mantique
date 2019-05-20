@@ -28,25 +28,5 @@ public class GraphsMain {
 		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
 		new VisualisationJFrame(cpt, term, cpt_term);
 		
-		//new UploadJFrame();
-		
-//		try {
-//			//Error Initialize
-//			ParserOnto parser = new ParserOnto("./ressources//clean_data.json");
-//			//System.out.println(parser.toString());
-//			//HashMap<String, Concept> lesCpts = parser.lesConcepts();
-//			//HashMap<String, Terme> lestrm = parser.lesTermes(lesCpts);
-//			HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
-//			for(Entry<String, ArrayList<String>> cptTerm : cpt_term.entrySet()) {
-//				System.out.print(cptTerm.getKey() +" --> "+cptTerm.getValue().toString() +"\n");
-//			}
-//			
-//			
-//			//System.out.println("Les concepts :" + lesCpts.toString());
-//			//System.out.println("Les termes :" + lestrm.toString());
-//		
-//		}catch (Exception e ){
-//			e.printStackTrace();
-//		}
 	}
 }
