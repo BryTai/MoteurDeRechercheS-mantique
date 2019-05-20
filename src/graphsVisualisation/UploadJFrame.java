@@ -32,6 +32,7 @@ import javax.swing.tree.TreeSelectionModel;
 /**
  * An interface to help the user choosing the documents that he has to upload
  */
+@SuppressWarnings("unused")
 public class UploadJFrame extends JFrame {
 	private static final long serialVersionUID = -7498139402373436629L;
 	
@@ -118,7 +119,6 @@ public class UploadJFrame extends JFrame {
     private final String REMOVE_MENU_ITEM_NAME = "Supprimer";
     
     //Main interface
-    @SuppressWarnings("unused")
 	private VisualisationJFrame main_frame;
     
     //Upload interface
@@ -180,9 +180,7 @@ public class UploadJFrame extends JFrame {
 	
 	//Dialogs
 	private AlertDialog alert_dialog;
-	@SuppressWarnings("unused")
 	private SuccessDialog success_dialog;
-	@SuppressWarnings("unused")
 	private ErrorDialog error_dialog;
 	
 	//JPopupMenus
