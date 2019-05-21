@@ -4,6 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -93,10 +100,10 @@ public class DocumentFrame extends JFrame {
 	private Border concept_panel_border;
 	
 	//DefaultListModel
-	private DefaultListModel<String> concepts_list_model;
+	private DefaultListModel<Concept> concepts_list_model;
 	
 	//JLists
-	private JList<String> concepts_list;
+	private JList<Concept> concepts_list;
 	
 	//JScrollPane
 	private JScrollPane concepts_view;
@@ -116,18 +123,27 @@ public class DocumentFrame extends JFrame {
 	//Fonts
 	private Font title_font;
 	
-	//TODO à enlever
-	public DocumentFrame() {
-		new DocumentFrame(null);
-	}
+	// Concepts and Terms
+	private HashMap<String, Concept> cpt;
+	private HashMap<String, Terme> term;
+	private HashMap<String, ArrayList<String>> cpt_term;
+	private File chosen_file;
+	private HashMap<String, List<Concept>> listDoc;
 	
 	/**
 	 * Main constructor
 	 * @param upload_frame: the upload/download interface
 	 */
-	public DocumentFrame(UploadJFrame upload_frame) {
+	public DocumentFrame(UploadJFrame upload_frame, HashMap<String, Concept> cpt, HashMap<String, Terme> term, HashMap<String, ArrayList<String>> cpt_term, File chosen_file) {
 		//Initialization
 		this.upload_frame = upload_frame;
+		
+		this.listDoc = new HashMap<String, List<Concept>>();
+		// Concepts and Terms
+		this.cpt = cpt;
+		this.term = term;
+		this.cpt_term = cpt_term;
+		this.chosen_file = chosen_file;
 		
 		this.document_panel = new JPanel();
 		this.concepts_panel = new JPanel();
@@ -142,9 +158,10 @@ public class DocumentFrame extends JFrame {
 		
 		this.concept_panel_border = BorderFactory.createTitledBorder(CONCEPTS_BORDER_TEXT);
 
-		this.concepts_list_model = new DefaultListModel<String>();
+		this.concepts_list_model = new DefaultListModel<Concept>();
 		this.getConcepts();
-		this.concepts_list = new JList<String>(concepts_list_model);
+		this.addListeners();
+		this.concepts_list = new JList<Concept>(concepts_list_model);
 		this.concepts_view = new JScrollPane(concepts_list);
 		
 		this.document_panel_dimension = new Dimension(DOCUMENT_PANEL_X, DOCUMENT_PANEL_Y);
@@ -202,13 +219,33 @@ public class DocumentFrame extends JFrame {
 		this.setVisible(IS_VISIBLE);
 		this.setResizable(IS_RESIZABLE);
 	}
+	
+
 
 	/**
 	 * To get the concepts and to add them in the check box
 	 */
 	private void getConcepts() {
-		// TODO Auto-generated method stub
-		concepts_list_model.addElement("bô jeu");
-		concepts_list_model.addElement("bô jeu 2");
+
+		for (Entry<String, Concept> cpts : cpt.entrySet()) {
+				
+			concepts_list_model.addElement(cpts.getValue());
+		}
+	}
+	
+	/**
+     * To add all the listeners for the interface
+     */
+	private void addListeners() {
+		//Adding a listener for the submit button
+		submit_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Document d1 = new Document(document_input_name.getText(), chosen_file.toPath(), concepts_list.getSelectedValuesList());
+				listDoc.put(d1.getName(),d1.getCpt());
+
+			}
+			
+		});
 	}
 }

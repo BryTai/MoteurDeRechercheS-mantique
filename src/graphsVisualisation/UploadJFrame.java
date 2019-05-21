@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -190,13 +192,23 @@ public class UploadJFrame extends JFrame {
 	//JMenuItems
 	private JMenuItem remove_menu_item;
 	
+	// Concepts and Terms
+	private HashMap<String, Concept> cpt;
+	private HashMap<String, Terme> term;
+	private HashMap<String, ArrayList<String>> cpt_term;
+	
 	/** 
 	 * Main constructor
 	 *@param main_frame: The main interface
 	 */
-	public UploadJFrame(VisualisationJFrame main_frame) {
+	public UploadJFrame(VisualisationJFrame main_frame, HashMap<String, Concept> cpt, HashMap<String, Terme> term, HashMap<String, ArrayList<String>> cpt_term) {
 		//Initialization
 		this.main_frame = main_frame;
+		
+		// Concepts and Terms
+		this.cpt = cpt;
+		this.term = term;
+		this.cpt_term = cpt_term;
 		
 		this.upload_frame = this;
 		
@@ -413,8 +425,8 @@ public class UploadJFrame extends JFrame {
 							try {
 								Path dest = new File(DOWNLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
 								Files.copy(last_chosen_file.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
-								success_dialog = new SuccessDialog(upload_frame, DOWNLOAD_SUCCESS);
-								
+								//success_dialog = new SuccessDialog(upload_frame, DOWNLOAD_SUCCESS);
+								new DocumentFrame(upload_frame, cpt, term, cpt_term, last_chosen_file);
 								//Refresh the interface
 								downloaded_documents_list.updateUI();
 							} catch (IOException e1) {
@@ -450,6 +462,7 @@ public class UploadJFrame extends JFrame {
 						Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
 						Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
 						uploaded_documents_list.updateUI();
+						
 					}else {
 						//If we can't write on the upload directory
 						error_dialog = new ErrorDialog(upload_frame, NO_WRITING_PERMISSION);
