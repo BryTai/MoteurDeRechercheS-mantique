@@ -1,6 +1,5 @@
 package graphsVisualisation;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -42,27 +41,27 @@ public class DocumentFrame extends JFrame {
 	
 	//Constants for the dimensions
 	private final short DOCUMENT_PANEL_X = WIDTH;
-	private final short DOCUMENT_PANEL_Y = 2*HEIGHT/10;
+	private final short DOCUMENT_PANEL_Y = 5*HEIGHT/20;
 
 	private final short CONCEPT_PANEL_X = WIDTH;
 	private final short CONCEPT_PANEL_Y = HEIGHT-DOCUMENT_PANEL_Y;
 	
 	private final short DOCUMENT_LABEL_X = WIDTH;
-	private final short DOCUMENT_LABEL_Y = DOCUMENT_PANEL_Y/3;
+	private final short DOCUMENT_LABEL_Y = 2*DOCUMENT_PANEL_Y/5;
 	
 	private final short DOCUMENT_NAME_X = (WIDTH-30)/10;
-	private final short DOCUMENT_NAME_Y = DOCUMENT_PANEL_Y/3;
+	private final short DOCUMENT_NAME_Y = DOCUMENT_PANEL_Y/4;
 
-	private final short DOCUMENT_PATH_X = WIDTH-50;
-	private final short DOCUMENT_PATH_Y = DOCUMENT_PANEL_Y/3;
+	private final short DOCUMENT_PATH_X = WIDTH-30;
+	private final short DOCUMENT_PATH_Y = DOCUMENT_PANEL_Y/4;
 
 	private final short CONCEPTS_PANEL_X = WIDTH;
-	private final short CONCEPTS_PANEL_Y = 7*HEIGHT/10;
+	private final short CONCEPTS_PANEL_Y = HEIGHT-DOCUMENT_PANEL_Y;
 
 	private final short CONCEPTS_VIEW_X = CONCEPTS_PANEL_X-30;
-	private final short CONCEPTS_VIEW_Y = 6*CONCEPTS_PANEL_Y/7;
+	private final short CONCEPTS_VIEW_Y = 11*CONCEPTS_PANEL_Y/14;
 	
-	private final short DOCUMENT_INPUT_X = 7*(WIDTH-30)/10;
+	private final short DOCUMENT_INPUT_X = WIDTH-30-DOCUMENT_NAME_X;
 	private final short DOCUMENT_INPUT_Y = 3*DOCUMENT_NAME_Y/5;
 	
 	//Constants for the border
@@ -163,7 +162,6 @@ public class DocumentFrame extends JFrame {
 		document_panel.setPreferredSize(document_panel_dimension);
 		concepts_panel.setPreferredSize(concept_panel_dimension);
 		
-		document_label.setBackground(Color.red);
 		document_label.setPreferredSize(document_label_dimension);
 		document_label.setFont(title_font);
 		document_label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -188,7 +186,7 @@ public class DocumentFrame extends JFrame {
 		//Adding elements to the concept panel
 		concepts_panel.add(concepts_view);
 		concepts_panel.add(submit_button);
-		
+				
 		//Adding elements to the frame
 		this.add(document_panel);
 		this.add(concepts_panel);

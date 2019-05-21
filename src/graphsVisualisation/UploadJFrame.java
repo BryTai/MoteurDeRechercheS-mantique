@@ -96,16 +96,11 @@ public class UploadJFrame extends JFrame {
     //Constants for the message for the Dialogs
     private final String NO_FILE_SELECTED = "Aucun fichier n'a été choisi !";
     private final String IS_NOT_A_FILE = "L'élément sélectionné n'est pas un fichier !";
-    private final String DOWNLOAD_FILE_REPLACEMENT = "Le fichier existe déjà, voulez-vous le remplacer ?";
     private final String DOWNLOAD_SUCCESS = "Le fichier a correctement été téléchargé !";
     private final String UPLOAD_SUCCESS = "Le fichier a correctement été uploadé !";
     private final String DOWNLOAD_FAILURE = "Le fichier n'a pas été téléchargé !";
     private final String UPLOAD_FAILURE = "Le fichier n'a pas été uploadé !";
     private final String NO_WRITING_PERMISSION = "Impossible d'écrire dans le répertoire ciblé !";
-    
-    //Constants for the layouts
-    private final byte OPTIONS_PANEL_LAYOUT_COL = 1;
-    private final byte OPTIONS_PANEL_LAYOUT_ROW = 2;
     
     //Constants for the file chooser
     private final boolean CAN_SELECT_MULTIPLE_DOCUMENTS = false;
@@ -179,7 +174,6 @@ public class UploadJFrame extends JFrame {
 	private File file_to_delete;
 	
 	//Dialogs
-	private AlertDialog alert_dialog;
 	@SuppressWarnings("unused")
 	private SuccessDialog success_dialog;
 	@SuppressWarnings("unused")
@@ -303,8 +297,8 @@ public class UploadJFrame extends JFrame {
 		
 		//Adding elements to the options panel
 		options_panel.add(choose_button);
-		options_panel.add(download_button);
 		options_panel.add(upload_button);
+		options_panel.add(download_button);
 		
 		//Adding elements to the interface
 		this.add(title_panel);
@@ -437,7 +431,7 @@ public class UploadJFrame extends JFrame {
 		upload_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try{
+				if(last_chosen_file != null) {
 					File upload_directory = new File(UPLOADED_DOCUMENTS_PATH);
 					
 					//Creates the repository if it doesn't exist
@@ -448,13 +442,19 @@ public class UploadJFrame extends JFrame {
 					//If we can write on the upload directory
 					if(upload_directory.canWrite()) {
 						Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
-						Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
+						try {
+							Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
+							new DocumentFrame(upload_frame);
+							success_dialog = new SuccessDialog(upload_frame, UPLOAD_SUCCESS);
+						}catch(Exception e1) {
+							error_dialog = new ErrorDialog(upload_frame, UPLOAD_FAILURE);
+						}
 						uploaded_documents_list.updateUI();
 					}else {
 						//If we can't write on the upload directory
 						error_dialog = new ErrorDialog(upload_frame, NO_WRITING_PERMISSION);
 					}
-				}catch(Exception e2) {
+				}else {
 					error_dialog = new ErrorDialog(upload_frame, NO_FILE_SELECTED);
 				}
 			}			

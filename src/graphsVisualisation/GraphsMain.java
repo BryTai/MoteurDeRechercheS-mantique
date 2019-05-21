@@ -26,7 +26,8 @@ public class GraphsMain {
 		HashMap<String, Concept> cpt = parser.lesConcepts();
 		HashMap<String, Terme> term = parser.lesTermes(cpt);
 		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
-		new VisualisationJFrame(cpt, term, cpt_term);
+		//new VisualisationJFrame(cpt, term, cpt_term);
 		
+		new DocumentFrame();
 	}
 }
