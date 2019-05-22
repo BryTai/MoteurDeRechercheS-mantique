@@ -6,6 +6,7 @@ import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,10 +15,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-//TODO DOCS
+/**
+ * The interface to make a document indexable
+ */
 public class DocumentFrame extends JFrame {
 	private static final long serialVersionUID = 6155703812504294146L;
 
@@ -68,6 +72,7 @@ public class DocumentFrame extends JFrame {
 	private final String CONCEPTS_BORDER_TEXT = "Concepts";
 	
 	//UploadJFrame
+	@SuppressWarnings("unused")
 	private UploadJFrame upload_frame;
 		
 	//Icons
@@ -177,6 +182,8 @@ public class DocumentFrame extends JFrame {
 		concepts_view.setPreferredSize(concepts_view_dimension);
 		concepts_view.setBorder(concept_panel_border);
 		
+		concepts_list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+				
 		//Adding elements to the document panel
 		document_panel.add(document_label);
 		document_panel.add(document_name);
@@ -191,6 +198,7 @@ public class DocumentFrame extends JFrame {
 		this.add(document_panel);
 		this.add(concepts_panel);
 		
+		this.addListeners();
 		this.setLayout(main_layout);
 		this.main_icon = new ImageIcon(MAIN_ICON_PATH);
 		this.setIconImage(main_icon.getImage()); // To set an icon at the top left of the interface
@@ -202,10 +210,42 @@ public class DocumentFrame extends JFrame {
 	}
 
 	/**
+	 * To add all the listeners on the interface
+	 */
+	private void addListeners() {
+		//Adding a listener to enable the multi-selection without using "ctrl"
+		concepts_list.setSelectionModel(new DefaultListSelectionModel() {
+			private static final long serialVersionUID = 2840147565923752860L;
+			boolean gestureStarted = false;
+			
+			//To manage the interaction when an element is selected
+		    @Override
+		    public void setSelectionInterval(int index0, int index1) {
+		        if(!gestureStarted){
+		            if (isSelectedIndex(index0)) {
+		                super.removeSelectionInterval(index0, index1);
+		            } else {
+		                super.addSelectionInterval(index0, index1);
+		            }
+		        }
+		        gestureStarted = true;
+		    }
+
+		    //When the "value" of an element is changed
+		    @Override
+		    public void setValueIsAdjusting(boolean isAdjusting) {
+		        if (isAdjusting == false) {
+		            gestureStarted = false;
+		        }
+		    }
+
+		});	
+	}
+
+	/**
 	 * To get the concepts and to add them in the check box
 	 */
 	private void getConcepts() {
-		// TODO Auto-generated method stub
 		concepts_list_model.addElement("bô jeu");
 		concepts_list_model.addElement("bô jeu 2");
 	}
