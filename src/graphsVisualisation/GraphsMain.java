@@ -28,5 +28,6 @@ public class GraphsMain {
 		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
 		new VisualisationJFrame(cpt, term, cpt_term);
 		
+		//new DocumentFrame();
 	}
 }
