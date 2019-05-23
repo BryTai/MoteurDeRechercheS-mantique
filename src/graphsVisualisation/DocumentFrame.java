@@ -164,7 +164,6 @@ public class DocumentFrame extends JFrame {
 
 		this.concepts_list_model = new DefaultListModel<Concept>();
 		this.getConcepts();
-		this.addListeners();
 		this.concepts_list = new JList<Concept>(concepts_list_model);
 		this.concepts_view = new JScrollPane(concepts_list);
 		
@@ -226,8 +225,6 @@ public class DocumentFrame extends JFrame {
 		this.setResizable(IS_RESIZABLE);
 	}
 	
-
-
 	/**
 	 * To add all the listeners on the interface
 	 */

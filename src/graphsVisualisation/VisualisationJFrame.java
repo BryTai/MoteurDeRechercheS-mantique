@@ -649,6 +649,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				search_manager.actionPerformed(evt);
+				new DocumentListFrame();
 			}
 		});
 

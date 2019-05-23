@@ -176,7 +176,6 @@ public class UploadJFrame extends JFrame {
 	private File file_to_delete;
 	
 	//Dialogs
-	@SuppressWarnings("unused")
 	private SuccessDialog success_dialog;
 	private ErrorDialog error_dialog;
 	
