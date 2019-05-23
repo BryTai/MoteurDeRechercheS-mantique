@@ -631,7 +631,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener {
 		menu_item_upload.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new UploadJFrame(main_frame);
+				new UploadJFrame(main_frame, cpt, term, cpt_term);
 			}
 		});
 

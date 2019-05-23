@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -32,6 +34,7 @@ import javax.swing.tree.TreeSelectionModel;
 /**
  * An interface to help the user choosing the documents that he has to upload
  */
+@SuppressWarnings("unused")
 public class UploadJFrame extends JFrame {
 	private static final long serialVersionUID = -7498139402373436629L;
 	
@@ -112,7 +115,6 @@ public class UploadJFrame extends JFrame {
     private final String REMOVE_MENU_ITEM_NAME = "Supprimer";
     
     //Main interface
-    @SuppressWarnings("unused")
 	private VisualisationJFrame main_frame;
     
     //Upload interface
@@ -120,8 +122,9 @@ public class UploadJFrame extends JFrame {
 
     //JButtons
     private JButton choose_button;
-    private JButton download_button;
     private JButton upload_button;
+    private JButton download_button;
+
     
 	//JPanels
 	private JPanel title_panel;
@@ -175,7 +178,6 @@ public class UploadJFrame extends JFrame {
 	//Dialogs
 	@SuppressWarnings("unused")
 	private SuccessDialog success_dialog;
-	@SuppressWarnings("unused")
 	private ErrorDialog error_dialog;
 	
 	//JPopupMenus
@@ -184,13 +186,23 @@ public class UploadJFrame extends JFrame {
 	//JMenuItems
 	private JMenuItem remove_menu_item;
 	
-	/**
+	// Concepts and Terms
+	private HashMap<String, Concept> cpt;
+	private HashMap<String, Terme> term;
+	private HashMap<String, ArrayList<String>> cpt_term;
+	
+	/** 
 	 * Main constructor
 	 *@param main_frame: The main interface
 	 */
-	public UploadJFrame(VisualisationJFrame main_frame) {
+	public UploadJFrame(VisualisationJFrame main_frame, HashMap<String, Concept> cpt, HashMap<String, Terme> term, HashMap<String, ArrayList<String>> cpt_term) {
 		//Initialization
 		this.main_frame = main_frame;
+		
+		// Concepts and Terms
+		this.cpt = cpt;
+		this.term = term;
+		this.cpt_term = cpt_term;
 		
 		this.upload_frame = this;
 		
@@ -406,8 +418,8 @@ public class UploadJFrame extends JFrame {
 							try {
 								Path dest = new File(DOWNLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
 								Files.copy(last_chosen_file.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
-								success_dialog = new SuccessDialog(upload_frame, DOWNLOAD_SUCCESS);
-								
+								//success_dialog = new SuccessDialog(upload_frame, DOWNLOAD_SUCCESS);
+								new DocumentFrame(upload_frame, cpt, term, cpt_term, last_chosen_file);
 								//Refresh the interface
 								downloaded_documents_list.updateUI();
 							} catch (IOException e1) {
@@ -443,12 +455,13 @@ public class UploadJFrame extends JFrame {
 						Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
 						try {
 							Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
-							new DocumentFrame(upload_frame);
+							new DocumentFrame(upload_frame, cpt, term, cpt_term, upload_directory);
 							success_dialog = new SuccessDialog(upload_frame, UPLOAD_SUCCESS);
 						}catch(Exception e1) {
 							error_dialog = new ErrorDialog(upload_frame, UPLOAD_FAILURE);
 						}
 						uploaded_documents_list.updateUI();
+						
 					}else {
 						//If we can't write on the upload directory
 						error_dialog = new ErrorDialog(upload_frame, NO_WRITING_PERMISSION);
@@ -469,7 +482,7 @@ public class UploadJFrame extends JFrame {
 			    	int row = downloaded_documents_list.getClosestRowForLocation(e.getX(), e.getY());
 			    	downloaded_documents_list.setSelectionRow(row);
 			        file_to_delete = (File) downloaded_documents_list.getLastSelectedPathComponent();
-			    	System.out.println(file_to_delete.getName());
+			    	//System.out.println(file_to_delete.getName());
 			        
 			    	//To show the menu
 			    	list_menu.show(e.getComponent(), e.getX(), e.getY());
@@ -509,32 +522,11 @@ public class UploadJFrame extends JFrame {
 		});
 	}
 	
-		/**
-		 * To get the last chosen file on both lists (upload & download lists)
-		 * @return the TreeFile, null if nothing was selected
-		 */
-		public File getLastChosenFile() {
-			return last_chosen_file;
-		}
-		
-		/**
-		 * To test if a file is contained in a directory
-		 * @param base : The directory to search in
-		 * @param child : The file to compare
-		 * @return true if the file exists in the (sub)directories, false otherwise
-		 * @throws IOException
-		 */
-		public boolean isSubDirectory(File base, File child) throws IOException {
-			    base = base.getCanonicalFile();
-			    child = child.getCanonicalFile();
-
-			    File parentFile = child;
-			    while (parentFile != null) {
-			        if (base.equals(parentFile)) {
-			            return true;
-			        }
-			        parentFile = parentFile.getParentFile();
-			    }
-			    return false;
-			}
+	/**
+	 * To get the last chosen file on both lists (upload & download lists)
+	 * @return the TreeFile, null if nothing was selected
+	 */
+	public File getLastChosenFile() {
+		return last_chosen_file;
 	}
+}

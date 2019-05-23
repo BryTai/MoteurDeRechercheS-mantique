@@ -90,7 +90,7 @@ public static void searchIndex(String searchString) throws IOException, ParseExc
         }
         try{
             //extract text using library
-            PDDocument doc = PDDocument.load(new File(FILES_TO_INDEX_DIRECTORY+ "/"+ docName + ".pdf"));
+            PDDocument doc = PDDocument.load(new File(FILES_TO_INDEX_DIRECTORY+ "/"+ docName ));
             String text = new PDFTextStripper().getText(doc);
 
             //write the content to text file
