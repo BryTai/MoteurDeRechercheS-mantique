@@ -55,7 +55,6 @@ public class UploadJFrame extends JFrame {
     private final String DOWNLOAD_BUTTON_TEXT = "Download !";
     private final String UPLOAD_BUTTON_TEXT = "Upload !";
     private final String CHOOSE_BUTTON_TEXT = "Choisir fichier !";
-    
 
     //Constants for the paths
     private final String MAIN_ICON_PATH = "ressources/logo.png";
