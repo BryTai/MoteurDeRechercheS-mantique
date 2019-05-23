@@ -455,7 +455,7 @@ public class UploadJFrame extends JFrame {
 						Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
 						try {
 							Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
-							new DocumentFrame(upload_frame);
+							new DocumentFrame(upload_frame, cpt, term, cpt_term, upload_directory);
 							success_dialog = new SuccessDialog(upload_frame, UPLOAD_SUCCESS);
 						}catch(Exception e1) {
 							error_dialog = new ErrorDialog(upload_frame, UPLOAD_FAILURE);

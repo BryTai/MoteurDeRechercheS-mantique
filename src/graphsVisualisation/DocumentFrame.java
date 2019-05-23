@@ -257,8 +257,16 @@ public class DocumentFrame extends JFrame {
 		            gestureStarted = false;
 		        }
 		    }
-
-		});	
+		});
+		
+		//Adding a listener for the submit button
+		submit_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Document d1 = new Document(document_input_name.getText(), chosen_file.toPath(), concepts_list.getSelectedValuesList());
+				listDoc.put(d1.getName(),d1.getCpt());
+			}
+		});
 	}
 
 	/**
@@ -268,19 +276,5 @@ public class DocumentFrame extends JFrame {
 		for (Entry<String, Concept> cpts : cpt.entrySet()) {		
 			concepts_list_model.addElement(cpts.getValue());
 		}
-	}
-	
-	/**
-     * To add all the listeners for the interface
-     */
-	private void addListeners() {
-		//Adding a listener for the submit button
-		submit_button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Document d1 = new Document(document_input_name.getText(), chosen_file.toPath(), concepts_list.getSelectedValuesList());
-				listDoc.put(d1.getName(),d1.getCpt());
-			}
-		});
 	}
 }
