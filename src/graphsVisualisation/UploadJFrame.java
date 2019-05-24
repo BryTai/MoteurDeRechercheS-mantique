@@ -62,7 +62,7 @@ public class UploadJFrame extends JFrame implements Serializable{
 
     //Constants for the paths
     private final String MAIN_ICON_PATH = "ressources/logo.png";
-    protected final String DOWNLOADED_DOCUMENTS_PATH = "downloaded docs";
+    protected final String DOWNLOADED_DOCUMENTS_PATH = "./ressources/fileToIndex";
 	private final String UPLOADED_DOCUMENTS_PATH = "uploaded docs";
     
 	//Constants for the font
@@ -455,7 +455,7 @@ public class UploadJFrame extends JFrame implements Serializable{
 						Path dest = new File(UPLOADED_DOCUMENTS_PATH + File.separator + last_chosen_file.getName()).toPath();
 						try {
 							Files.copy(last_chosen_file.toPath(),  dest, StandardCopyOption.REPLACE_EXISTING);
-							new DocumentFrame(upload_frame, cpt, term, cpt_term, upload_directory);
+							//new DocumentFrame(upload_frame, cpt, term, cpt_term, upload_directory);
 							success_dialog = new SuccessDialog(upload_frame, UPLOAD_SUCCESS);
 						}catch(Exception e1) {
 							error_dialog = new ErrorDialog(upload_frame, UPLOAD_FAILURE);

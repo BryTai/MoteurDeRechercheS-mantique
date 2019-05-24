@@ -178,9 +178,9 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private TitleLabelApparitionEffect title_label_effect;
 	private OptionsManager options_manager;
 	private DocumentRenderer doc_renderer;
-	
 	private DocumentObject selected_doc;
-	
+	private DocumentListFrame document_list_frame;
+
 	// Constants for the names of the menus
 	private final String MENU_FILE_NAME = "Fichier";
 	private final String MENU_EDIT_NAME = "Edition";
@@ -282,7 +282,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private final byte ELEMENTS_FONT_SIZE = 16;
 
 	// Constants for the labels in results_panel
-	private final String ROOT_NODE_NAME = "Liste des concepts";
+	private final String ROOT_NODE_NAME = "Liste des concepts"; 
 	private final String TERMS_LABEL_NAME = "Liste des termes";
 	private final String DOCUMENTS_LABEL_NAME = "Documents";
 	private final String INDEXED_FILE_PATH_NAME = "downloaded docs";
@@ -674,7 +674,6 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				search_manager.actionPerformed(evt);
-				new DocumentListFrame();
 			}
 		});
 
@@ -714,6 +713,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		//Adding a listener to open the selected document with a double left click
 		documents_list.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent evt) {	
+				File file_to_open = null;
 
 				if(evt.getClickCount() == 2) {
 					//Get the selected element if the user double left-clicked
@@ -725,14 +725,18 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 					ArrayList<DocumentObject> documents_of_concept = cpt.get(conceptId).getListe_doc();
 					
 					for (int i = 0; i<documents_of_concept.size(); i++) {
-						try {
+
 							String path_to_open = documents_of_concept.get(i).getFilepath().toString();
-							File file_to_open = new File(path_to_open);
+							file_to_open = new File(path_to_open);
+					}
+						try {
+							if (file_to_open != null) {
 							Desktop.getDesktop().open(file_to_open);
+							}
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}
+					
 				}
 			}
 		});
@@ -919,6 +923,14 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	 */
 	protected void setTitleAnimationState(boolean b) {
 		this.menu_item_title_animation.setSelected(b);
+	}
+	
+	/**
+	 * To get the document list frame
+	 * @return the document list frame
+	 */
+	public DocumentListFrame getDocumentListFrame() {
+		return document_list_frame;
 	}
 
 	/**

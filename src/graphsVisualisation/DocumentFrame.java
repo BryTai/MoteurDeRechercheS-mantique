@@ -291,6 +291,11 @@ public class DocumentFrame extends JFrame implements Serializable {
 				Sauvegarde.write(listDoc, file_doc_concept);
 				Sauvegarde.writeMap(cpt, file_concept);
 				cpt = Sauvegarde.readMap(file_concept);
+				try {
+					Indexation.createIndex();
+				} catch (IOException e3) {
+					e3.printStackTrace();
+				}
 				document_frame.dispose();
 
 				

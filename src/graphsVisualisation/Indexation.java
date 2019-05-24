@@ -58,21 +58,20 @@ public class Indexation {
     }
   //************************************************************************************************************************************************************
     @SuppressWarnings("unchecked")
-    public static void searchIndex(String searchString, HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term) throws IOException, ParseException{
-        System.out.println("Rechercher : '" + searchString + "'");
+    public static ArrayList<DocumentObject> searchIndex(String searchString, HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term) throws IOException, ParseException{
         Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY); 
         IndexReader indexReader = IndexReader.open(directory);
         IndexSearcher indexSearcher= new IndexSearcher(indexReader);
         ArrayList<ArrayList<String>> list_research = Indexation.researchOnto(searchString,cpt,trm,cpt_term);
         ArrayList<String> list_key = new ArrayList<String>();
+        ArrayList<DocumentObject> list_doc = new ArrayList<DocumentObject>();
         String finalQuery = "";
         Analyzer analyzer = new StandardAnalyzer();
         QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
         
-        
-        System.out.println("La final");
-        System.out.println(list_research.toString());
+       
         ArrayList<String> research_purged = new ArrayList<String>();
+        
         for(int i = 0 ; i < list_research.size() ; i++) {
         	for(int j = 0 ; j < list_research.get(i).size() ; j++) {
         		if(!research_purged.contains(list_research.get(i).get(j))) {
@@ -86,11 +85,19 @@ public class Indexation {
         for(int i = 0 ; i < research_purged.size() ; i++) {
         	finalQuery = finalQuery +  research_purged.get(i) + " ";
         }
+        for(int i = 0 ; i < list_key.size() ; i++) {
+        	Concept cptEnCours = cpt.get(list_key.get(i));
+        	ArrayList<DocumentObject> list_doc_en_cours = new ArrayList<DocumentObject>(cptEnCours.getListe_doc());
+        	for(int j = 0 ; j < list_doc_en_cours.size() ; j++) {
+        		if(!list_doc.contains(list_doc_en_cours.get(j))) {
+            		list_doc.add(list_doc_en_cours.get(j));
+            	}
+        	}
+        	
+        		
+        }
+
         
-        System.out.println("finalquery:");
-        System.out.println(finalQuery);
-        System.out.println("Liste clés concepts");
-        System.out.println(list_key.toString());
         Query query;
         if(!finalQuery.equals("")) {
         	query = queryParser.parse(finalQuery);
@@ -104,8 +111,26 @@ public class Indexation {
         	Hit hit = it.next();
         	Document document = hit.getDocument();
         	String path = document.get(FIELD_PATH);
-            System.out.println("Hit : " + path);
-            } 
+        	if(!list_doc.isEmpty()) {
+        		for(int i = 0 ; i < list_doc.size() ; i++) {
+            		String path_en_cours = list_doc.get(i).getFilepath().toAbsolutePath().toString();
+            		String path_ok =  list_doc.get(i).getFilepath().toString();
+            		if(!path_en_cours.equals(path)) {
+            			DocumentObject newDoc = new DocumentObject(path_ok);
+            			list_doc.add(newDoc);
+            		}
+        		}
+        	}else{
+        		
+        		//String[] name = path.split(".*\\");
+        		DocumentObject newDoc = new DocumentObject(path,path);
+        		//System.out.println(name[0]);
+        		list_doc.add(newDoc);
+        	}
+        }
+            
+
+        return list_doc;
        
         
     }
@@ -249,7 +274,7 @@ public class Indexation {
     	String[] et  = research.trim().split(" et ");
     	String[] ou  = research.trim().split(" ou ");
     	research = research.trim();
-    	System.out.println(research);
+    	//System.out.println(research);
     	//La liste contenant les termes et les concepts de la recherche   	
 		ArrayList<ArrayList<String>> liste_recherche = new ArrayList<ArrayList<String>>();
 		//Recherche parmis les concepts
@@ -257,12 +282,14 @@ public class Indexation {
 		
 		//La recherche globale est un concept
 		if(!(keyCResearch== null)) {
+//			System.out.println("clé cpt");
+//			System.out.println(keyCResearch);
 			if(!cpt_term.get(keyCResearch).isEmpty()) {
 				ArrayList<String> liste_terme = new ArrayList<String>(cpt_term.get(keyCResearch));
 				for(int k = 0 ; k < liste_terme.size() ; k++) {
-					liste_terme.set(k, trm.get(liste_terme.get(k)).getName());
-							
+					liste_terme.set(k, trm.get(liste_terme.get(k)).getName());		
 					}
+					liste_terme.add(cpt.get(keyCResearch).getName());
 					if(!liste_recherche.contains(liste_terme)) {
 						liste_recherche.add(liste_terme);
 					}
@@ -288,8 +315,8 @@ public class Indexation {
 		
 		//for(Entry<String, Terme> lesTermes : trm.entrySet()) {
 		if(!(keyTResearch == null)) {
-			System.out.println("clé terme");
-			System.out.println(Indexation.termKey(keyTResearch, trm));
+//			System.out.println("clé terme");
+//			System.out.println(Indexation.termKey(keyTResearch, trm));
 			ArrayList<String> liste_termes;
 			for( String c : trm.get(keyTResearch).getConcepts() ){
 				liste_termes = new ArrayList<String>(cpt_term.get(c));
@@ -311,8 +338,7 @@ public class Indexation {
 		//On regarde la recherche split
 		for (int i  = 0 ; i < res.length ; i ++) {
 			String keyTSplit = Indexation.termKey(res[i], trm);
-			System.out.println("clé terme");
-			System.out.println(Indexation.termKey(res[i], trm));
+			
 			if(keyTSplit != null ) {
 				if(!liste_recherche.contains(Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term))) {
 					liste_recherche.add(Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term));
@@ -346,8 +372,8 @@ public class Indexation {
 		}
 		
     		
-    	System.out.println("ICI-------------------------");
-    	System.out.println(liste_recherche.toString());
+//    	System.out.println("ICI-------------------------");
+//    	System.out.println(liste_recherche.toString());
     	return liste_recherche;
     }
     

@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -97,10 +99,10 @@ public class DocumentListFrame extends JFrame {
 	private Border documents_panel_border;
 
 	//DefaultListModels
-	private DefaultListModel<File> documents_list_model;
+	private DefaultListModel<DocumentObject> documents_list_model;
 
 	//JLists
-	private JList<File> documents_list;
+	private JList<DocumentObject> documents_list;
 
 	//JScrollPanes
 	private JScrollPane documents_view;
@@ -116,9 +118,10 @@ public class DocumentListFrame extends JFrame {
 	
 	/**
 	 * Main constructor
+	 * @param documents_list_to_add 
 	 */
-	public DocumentListFrame() {
-		//Initialiation
+	public DocumentListFrame(ArrayList<DocumentObject> documents_list_to_add) {
+		//Initialiation		
 		this.main_icon = new ImageIcon(MAIN_ICON_PATH);
 		
 		this.title_panel = new JPanel();
@@ -137,9 +140,9 @@ public class DocumentListFrame extends JFrame {
 		
 		this.main_layout = new FlowLayout();
 		
-		this.documents_list_model = new DefaultListModel<File>();
-		this.getDocuments();
-		this.documents_list = new JList<File>(documents_list_model);
+		this.documents_list_model = new DefaultListModel<DocumentObject>();
+		this.getDocuments(documents_list_to_add);
+		this.documents_list = new JList<DocumentObject>(documents_list_model);
 		this.documents_view = new JScrollPane(documents_list);
 		
 		//Settings for the panels
@@ -188,13 +191,14 @@ public class DocumentListFrame extends JFrame {
 				if(evt.getClickCount() == 2) {
 					//Get the selected element if the user double left-clicked
 					@SuppressWarnings("unchecked")
-					JList<File> list = (JList<File>) evt.getSource();
+					JList<DocumentObject> list = (JList<DocumentObject>) evt.getSource();
 					int index = list.locationToIndex(evt.getPoint());
-					File selected_file = list.getModel().getElementAt(index);
+					DocumentObject selected_file = list.getModel().getElementAt(index);
 							
 					//Opening the selected with the default application
 					try {
-						Desktop.getDesktop().open(selected_file);
+						File file_to_open = new File(selected_file.getFilepath().toString());
+						Desktop.getDesktop().open(file_to_open);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -279,15 +283,22 @@ public class DocumentListFrame extends JFrame {
 	}
 	
 	/**
-	 * To get all the documents and to put them in the documents model
+	 * To get all the documents from a concept ID
 	 */
-	private void getDocuments() {
-		File[] all_documents = new File(DOCUMENTS_PATH).listFiles();
-		File current_file;
-		
-		for(int i=0; i< all_documents.length; i++) {
-			current_file = all_documents[i];
-			documents_list_model.addElement(current_file);
-		}
+	protected void getDocuments(ArrayList<DocumentObject> documents_list_to_add) {
+		documents_list_model.clear();
+        for(int i=0; i<documents_list_to_add.size(); i++) {
+        	documents_list_model.addElement(documents_list_to_add.get(i));
+        }
+        
+        //documents_list.updateUI();
+	}
+	
+	/**
+	 * To get the model of the document list
+	 * @return The document list model
+	 */
+	public DefaultListModel<DocumentObject> getDocumentsListModel() {
+		return documents_list_model;
 	}
 }

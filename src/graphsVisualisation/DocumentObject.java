@@ -3,6 +3,7 @@ package graphsVisualisation;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DocumentObject implements Serializable {
@@ -11,10 +12,21 @@ public class DocumentObject implements Serializable {
 	private String filepath;
 	private List<Concept> cpt;
 
-	public DocumentObject (String name, String filepath, List< Concept> cpt) {
+	public DocumentObject (String name, String filepath, List<Concept> cpt) {
 		this.name = name;
 		this.filepath = filepath;
 		this.cpt = cpt;
+	}
+	
+	public DocumentObject(String filepath) {
+		this.name = filepath;
+		this.filepath = filepath;
+		this.cpt = new ArrayList<Concept>();
+	}
+	public DocumentObject(String name,String filepath) {
+		this.name = name;
+		this.filepath = filepath;
+		this.cpt = new ArrayList<Concept>();
 	}
 
 	public String getName() {
