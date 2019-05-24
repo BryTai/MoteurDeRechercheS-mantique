@@ -1,9 +1,7 @@
 package graphsVisualisation;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 //Classe repr�sentant les concepts des ontoterminologies
 public class Concept implements Serializable {
 	

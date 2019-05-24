@@ -153,7 +153,7 @@ public class DocumentListFrame extends JFrame {
 		
 		documents_view.setPreferredSize(documents_view_dimension);
 		
-		documents_list.setCellRenderer(new FileRenderer());
+		documents_list.setCellRenderer(new DocumentRenderer());
 		documents_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		//Adding elements to the panels
