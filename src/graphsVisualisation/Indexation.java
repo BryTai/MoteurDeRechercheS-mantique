@@ -64,6 +64,7 @@ public class Indexation {
         IndexReader indexReader = IndexReader.open(directory);
         IndexSearcher indexSearcher= new IndexSearcher(indexReader);
         ArrayList<ArrayList<String>> list_research = Indexation.researchOnto(searchString,cpt,trm,cpt_term);
+        ArrayList<String> list_key = new ArrayList<String>();
         String finalQuery = "";
         Analyzer analyzer = new StandardAnalyzer();
         QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
@@ -77,13 +78,19 @@ public class Indexation {
         		if(!research_purged.contains(list_research.get(i).get(j))) {
         			research_purged.add(list_research.get(i).get(j));
         		}
+        		if(Indexation.conceptKey(list_research.get(i).get(j), cpt) != (null) && !list_key.contains(Indexation.conceptKey(list_research.get(i).get(j), cpt))) {
+        			list_key.add(Indexation.conceptKey(list_research.get(i).get(j), cpt));
+        		}
         	}
         }
         for(int i = 0 ; i < research_purged.size() ; i++) {
         	finalQuery = finalQuery +  research_purged.get(i) + " ";
         }
-        System.out.println("finaquery");
+        
+        System.out.println("finalquery:");
         System.out.println(finalQuery);
+        System.out.println("Liste clés concepts");
+        System.out.println(list_key.toString());
         Query query;
         if(!finalQuery.equals("")) {
         	query = queryParser.parse(finalQuery);
@@ -238,10 +245,11 @@ public class Indexation {
      * @return List of the list with the new term and concept
      */
     public static  ArrayList<ArrayList<String>> researchOnto(String research,HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term) {
-    	String[] res = research.split(" ");
-    	String[] et  = research.split(" et ");
-    	String[] ou  = research.split(" ou ");
-    	
+    	String[] res = research.trim().split("\\s+");
+    	String[] et  = research.trim().split(" et ");
+    	String[] ou  = research.trim().split(" ou ");
+    	research = research.trim();
+    	System.out.println(research);
     	//La liste contenant les termes et les concepts de la recherche   	
 		ArrayList<ArrayList<String>> liste_recherche = new ArrayList<ArrayList<String>>();
 		//Recherche parmis les concepts
@@ -256,24 +264,32 @@ public class Indexation {
 							
 					}
 					if(!liste_recherche.contains(liste_terme)) {
-						liste_recherche.add(0,liste_terme);
+						liste_recherche.add(liste_terme);
 					}
 						
 				} 
-			//on recherche dans la recherche split 
-			for (int i  = 0 ; i < res.length ; i ++) {
-				String keyCSplit = Indexation.conceptKey(res[i], cpt);
-	    		if(!liste_recherche.contains(Indexation.searchConcept(keyCSplit,cpt,trm, cpt_term))) {
-	    				liste_recherche.add(0,Indexation.searchConcept(keyCSplit,cpt,trm, cpt_term));
-	    		}
-	    				
-	    	}
+			 
+			
 		}
+		//on recherche dans la recherche split
+		for (int i  = 0 ; i < res.length ; i ++) {
+			String keyCSplit = Indexation.conceptKey(res[i], cpt);
+			if(keyCSplit != null) {
+				if(!liste_recherche.contains(Indexation.searchConcept(keyCSplit,cpt,trm, cpt_term))) {
+    				liste_recherche.add(Indexation.searchConcept(keyCSplit,cpt,trm, cpt_term));
+				}
+			}
+    		
+    				
+    	}
 
 		//On recherche dans les termes
 		String keyTResearch = Indexation.termKey(research, trm);
+		
 		//for(Entry<String, Terme> lesTermes : trm.entrySet()) {
 		if(!(keyTResearch == null)) {
+			System.out.println("clé terme");
+			System.out.println(Indexation.termKey(keyTResearch, trm));
 			ArrayList<String> liste_termes;
 			for( String c : trm.get(keyTResearch).getConcepts() ){
 				liste_termes = new ArrayList<String>(cpt_term.get(c));
@@ -281,23 +297,29 @@ public class Indexation {
 					liste_termes.set(k, trm.get(liste_termes.get(k)).getName());
 				}
 				if(!liste_recherche.contains(liste_termes)) {
-					liste_recherche.add(0,liste_termes);
+					liste_recherche.add(liste_termes);
 				}
 					
 				if(!liste_recherche.contains(searchConcept(c,cpt,trm,cpt_term))) {
-					liste_recherche.add(0,searchConcept(c,cpt,trm,cpt_term));
+					liste_recherche.add(searchConcept(c,cpt,trm,cpt_term));
 				}
 					
 			}
 				
-			//On regarde la recherche split
-			for (int i  = 0 ; i < res.length ; i ++) {
-				String keyTSplit = Indexation.termKey(res[i], trm);
-    			if(!liste_recherche.contains(Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term))) {
-    				liste_recherche.add(0,Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term));
-    			}
-    				
-    		}
+			
+		}
+		//On regarde la recherche split
+		for (int i  = 0 ; i < res.length ; i ++) {
+			String keyTSplit = Indexation.termKey(res[i], trm);
+			System.out.println("clé terme");
+			System.out.println(Indexation.termKey(res[i], trm));
+			if(keyTSplit != null ) {
+				if(!liste_recherche.contains(Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term))) {
+					liste_recherche.add(Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term));
+				}
+			}
+			
+				
 		}
 		
 		
@@ -305,7 +327,7 @@ public class Indexation {
 		if(et.length >= 1 ) {
 			for(int j = 0 ; j < et.length - 1 ; j++) {
 				ArrayList<ArrayList<String>>intersec = Indexation.intersection(Indexation.researchOnto(et[j],cpt,trm,cpt_term),Indexation.researchOnto(et[j+1],cpt,trm,cpt_term));
-				System.out.println("HELLOc" + intersec.toString());
+				
 				if(!liste_recherche.contains(intersec)) {
 					liste_recherche.addAll(intersec);
 				}
