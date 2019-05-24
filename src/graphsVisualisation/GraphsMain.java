@@ -36,11 +36,8 @@ public class GraphsMain implements Serializable{
 		}
 		HashMap<String, Terme> term = parser.lesTermes(cpt);
 		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
-
-		
-
-
 		new VisualisationJFrame(cpt, term, cpt_term);
 		
+
 	}
 }

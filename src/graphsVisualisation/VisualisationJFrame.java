@@ -3,6 +3,8 @@ package graphsVisualisation;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -10,11 +12,17 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
+import java.awt.Rectangle;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
@@ -47,8 +56,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * To show an interface to the user to help him browse the results of
  * the indexed documents of our semantic search engine.
  */
+
 @SuppressWarnings("unused")
 public class VisualisationJFrame extends JFrame implements ActionListener, Serializable {
+
 
 	private static final long serialVersionUID = 4882815445311467209L;
 
@@ -112,13 +123,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 
 	// JList
 	private JList<String> term_list;
-	@SuppressWarnings("rawtypes")
-	private JList documents_list;
+	private JList<File> documents_list;
 
 	// DefaultListModel
 	private DefaultListModel<String> term_list_model;
-	@SuppressWarnings("rawtypes")
-	private DefaultListModel documents_list_model;
+	private DefaultListModel<File> documents_list_model;
 
 	// Dimensions
 	private Dimension search_panel_dimension;
@@ -136,7 +145,6 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private Dimension concepts_tree_dimension;
 
 	// Borders
-	private Border title_panel_border;
 	private Border search_panel_border;
 	private Border results_panel_border;
 	private Border concepts_panel_border;
@@ -168,7 +176,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private WindowCloser main_window_closer;
 	private TitleLabelApparitionEffect title_label_effect;
 	private OptionsManager options_manager;
-
+	private FileRenderer file_renderer;
+	
 	// Constants for the names of the menus
 	private final String MENU_FILE_NAME = "Fichier";
 	private final String MENU_EDIT_NAME = "Edition";
@@ -273,6 +282,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private final String ROOT_NODE_NAME = "Liste des concepts";
 	private final String TERMS_LABEL_NAME = "Liste des termes";
 	private final String DOCUMENTS_LABEL_NAME = "Documents";
+	private final String INDEXED_FILE_PATH_NAME = "downloaded docs";
 
 	// Constants for the errors
 	private final String TRAY_ICON_ADDING_ERROR = "L'icône de notification n'a pas pu être créée !";
@@ -281,12 +291,10 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private HashMap<String, Concept> cpt;
 	private HashMap<String, Terme> term;
 	private HashMap<String, ArrayList<String>> cpt_term;
-
 	
 	/**
 	 * Main constructor of this class. This constructor creates all the interface.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public VisualisationJFrame(HashMap<String, Concept> cpt, HashMap<String, Terme> term, HashMap<String, ArrayList<String>> cpt_term) {
 		// Concepts and Terms
 		this.cpt = cpt;
@@ -356,9 +364,9 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 
 		this.documents_panel = new JPanel();
 		this.documents_label = new JLabel(DOCUMENTS_LABEL_NAME);
-		this.documents_list_model = new DefaultListModel();
+		this.documents_list_model = new DefaultListModel<File>();
 		this.addDocuments();
-		this.documents_list = new JList(documents_list_model);
+		this.documents_list = new JList<File>(documents_list_model);
 		this.documents_view = new JScrollPane(documents_list);
 
 		// Initialize layouts
@@ -386,10 +394,10 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		// Initialize miscellaneous classes
 		this.search_manager = new SearchManager(main_frame); // To manage the content of the search bar
 		this.main_window_closer = new WindowCloser(main_frame); // To manage the closing of the jframe
-		this.title_label_effect = new TitleLabelApparitionEffect(main_frame); // To manage the apparition of the title
-																				// label
+		this.title_label_effect = new TitleLabelApparitionEffect(main_frame); // To manage the apparition of the title																		// label
 		this.options_manager = new OptionsManager(main_frame);
-
+		this.file_renderer = new FileRenderer();
+		
 		// Settings of the title panel and their sub-elements
 		title_label.setFont(title_font);
 		title_label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -424,6 +432,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		documents_panel.setPreferredSize(documents_panel_dimension);
 		
 		documents_list.setFont(list_elements_font);
+		documents_list.setCellRenderer(file_renderer);
+		documents_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// Settings of the labels in results panel
 		terms_label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -566,19 +576,19 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	/**
 	 * To add all the documents linked to a term in the list of terms
 	 */
-	@SuppressWarnings("unchecked")
 	private void addDocuments() {
-		String document_to_add;
-		for (byte i = 0; i < 30; i++) {
-			document_to_add = "- test" + Byte.toString(i);
-			if (!document_to_add.equals("")) {
-				document_to_add = Character.toUpperCase(document_to_add.charAt(0)) + document_to_add.substring(1);
-			}
-
-			documents_list_model.addElement(document_to_add);
+		File documents_folder = new File(INDEXED_FILE_PATH_NAME);
+		
+		//Creates the folder where the documents are located if it doesn't exists
+		if(!documents_folder.exists()) {
+			documents_folder.mkdir();
 		}
 		
-		this.documents_list_model = orderListModel(documents_list_model);
+		//Adding all the documents to the model
+		File[] documents_list = documents_folder.listFiles();
+		for (int i = 0; i < documents_list.length; i++) {
+			documents_list_model.addElement(documents_list[i]);
+		}
 	}
 
 	/**
@@ -643,6 +653,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				search_manager.actionPerformed(evt);
+				new DocumentListFrame();
 			}
 		});
 
@@ -676,6 +687,46 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 			}
 		});
 
+		//Adding a listener to open the selected document with a double left click
+		documents_list.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent evt) {	
+				if(evt.getClickCount() == 2) {
+					//Get the selected element if the user double left-clicked
+					@SuppressWarnings("unchecked")
+					JList<File> list = (JList<File>) evt.getSource();
+					int index = list.locationToIndex(evt.getPoint());
+					File selected_file = list.getModel().getElementAt(index);
+					
+					//Opening the selected with the default application
+					try {
+						Desktop.getDesktop().open(selected_file);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		//Adding a listener to change the cursor when the user is pointing to the documents list
+		documents_list.addMouseMotionListener(new MouseMotionListener() {
+		    @Override
+		    public void mouseMoved(MouseEvent e) {
+		        final int x = e.getX();
+		        final int y = e.getY();
+		        // only display a hand if the cursor is over the items
+		        final Rectangle cellBounds = documents_list.getCellBounds(0, documents_list.getModel().getSize() - 1);
+		        if (cellBounds != null && cellBounds.contains(x, y)) {
+		            documents_list.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		        } else {
+		        	documents_list.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		        }
+		    }
+
+		    @Override
+		    public void mouseDragged(MouseEvent e) {
+		    }
+		});
+		
 		this.addWindowListener(main_window_closer);
 	}
 
@@ -709,10 +760,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 			for (int i = 0; i < cpts.getValue().getIsa().length; i++) {
 				arborescence.get(cpts.getValue().getIsa()[i]).add(arborescence.get(cpts.getValue().getId()));
 			}
-
 		}
-
-
 	}
 
 	/**
