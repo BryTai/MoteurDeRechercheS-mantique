@@ -1,6 +1,7 @@
 package graphsVisualisation;
 
 import java.awt.Dialog;
+import java.io.Serializable;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -8,7 +9,7 @@ import javax.swing.JOptionPane;
 /**
  * To print an error message when an action on the interface is incorrect
  */
-public class ErrorDialog extends Dialog {
+public class ErrorDialog extends Dialog implements Serializable{
 	private static final long serialVersionUID = -7391329468980731762L;
 	private final String DIALOG_TITLE = "Erreur !";
 	

@@ -14,6 +14,7 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,8 +36,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -49,7 +48,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * the indexed documents of our semantic search engine.
  */
 @SuppressWarnings("unused")
-public class VisualisationJFrame extends JFrame implements ActionListener {
+public class VisualisationJFrame extends JFrame implements ActionListener, Serializable {
 
 	private static final long serialVersionUID = 4882815445311467209L;
 

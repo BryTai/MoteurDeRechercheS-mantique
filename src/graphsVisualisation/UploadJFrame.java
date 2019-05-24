@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -35,7 +36,7 @@ import javax.swing.tree.TreeSelectionModel;
  * An interface to help the user choosing the documents that he has to upload
  */
 @SuppressWarnings("unused")
-public class UploadJFrame extends JFrame {
+public class UploadJFrame extends JFrame implements Serializable{
 	private static final long serialVersionUID = -7498139402373436629L;
 	
 	//Constants for the jframe

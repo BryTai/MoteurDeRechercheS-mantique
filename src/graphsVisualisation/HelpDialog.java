@@ -1,6 +1,8 @@
 package graphsVisualisation;
 
 import java.awt.GridLayout;
+import java.io.Serializable;
+
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -8,7 +10,7 @@ import javax.swing.JPanel;
 /**
  * To show a dialog when the user clicks on the help menu item.
  */
-public class HelpDialog extends JDialog {
+public class HelpDialog extends JDialog implements Serializable {
     private static final long serialVersionUID = 4504363060864217659L;
 
     // JFrames

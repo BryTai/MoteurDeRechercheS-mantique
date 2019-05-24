@@ -1,9 +1,10 @@
 package graphsVisualisation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 //Classe représentant les termes des ontoterminologies
-public class Terme {
+public class Terme implements Serializable{
 	
 	//Attributs
 	private String name;

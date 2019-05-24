@@ -6,12 +6,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * To manage every option of the interface, for example the animation of
  * the title when the interface launches.
  */
-public class OptionsManager {
+public class OptionsManager implements Serializable{
 	//The main frame
 	private VisualisationJFrame main_frame;
 	

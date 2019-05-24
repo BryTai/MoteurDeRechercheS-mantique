@@ -2,10 +2,11 @@ package graphsVisualisation;
 
 import java.awt.Dialog;
 import java.io.File;
+import java.io.Serializable;
 
 import javax.swing.JOptionPane;
 
-public class AlertDialog extends Dialog{
+public class AlertDialog extends Dialog implements Serializable{
 	private static final long serialVersionUID = 2963292106536743590L;
 	private final String TITLE_TEXT = "Alerte !";
     protected final String DOWNLOADED_DOCUMENTS_PATH = "downloaded docs";

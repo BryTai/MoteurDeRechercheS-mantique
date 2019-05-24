@@ -1,10 +1,17 @@
 package graphsVisualisation;
 
-import com.google.gson.*;
-import java.io.*;
-import java.util.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map.Entry;
-public class ParserOnto {
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+public class ParserOnto implements Serializable{
 	
 	// Attributs
 	//Le chemin d'accès au Json
@@ -109,6 +116,7 @@ public class ParserOnto {
 			for(String inhDiff : cptEnCours.getInheritedDifferences()) {
 				cptEnCours.getDiff().add(dicoDifference.get(inhDiff));
 			}
+
 			dicoConcept.put(cpt.getKey(), cptEnCours);
 		}
 		return dicoConcept;

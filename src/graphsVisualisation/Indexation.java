@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Serializable;
 import java.util.Iterator;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -29,7 +30,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 
 
 @SuppressWarnings("deprecation")
-public class Indexation {
+public class Indexation implements Serializable{
 	private static final String FILES_TO_INDEX_DIRECTORY = "ressources/fileToIndex";
     private static final String INDEX_DIRECTORY = "ressources/indexDirectory";
     private static final String FIELD_PATH = "path";

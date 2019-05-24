@@ -1,17 +1,13 @@
 package graphsVisualisation;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.Map.Entry;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
-public class GraphsMain {
+public class GraphsMain implements Serializable{
 	/**
 	 * The entry point of the program
 	 * @param args: Arguments of the main method
@@ -23,9 +19,27 @@ public class GraphsMain {
 			e.printStackTrace();
 		}
 		ParserOnto parser = new ParserOnto("./ressources//clean_data.json");
-		HashMap<String, Concept> cpt = parser.lesConcepts();
+		File filename = new File("./ressources/concept_doc.txt");
+		HashMap<String, Concept> cpt = new HashMap<String, Concept>();
+
+
+		if(!filename.exists()) {
+			try {
+				cpt = parser.lesConcepts();;
+				filename.createNewFile();
+				Sauvegarde.writeMap(cpt, filename);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			cpt = Sauvegarde.readMap(filename);
+		}
 		HashMap<String, Terme> term = parser.lesTermes(cpt);
 		HashMap<String, ArrayList<String>> cpt_term = parser.cpt_trm();
+
+		
+
+
 		new VisualisationJFrame(cpt, term, cpt_term);
 		
 	}

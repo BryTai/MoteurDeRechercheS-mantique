@@ -2,6 +2,7 @@ package graphsVisualisation;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 
 
 
@@ -9,7 +10,7 @@ import java.awt.event.ActionListener;
  * Manages the interactions between the search bar, the search button
  * and the results of the research that are printed on the interface.
  */
-public class SearchManager implements ActionListener {
+public class SearchManager implements ActionListener, Serializable {
 	//The main JFrame
 	private VisualisationJFrame main_frame;
 	

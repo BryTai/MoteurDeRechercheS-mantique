@@ -3,11 +3,12 @@ package graphsVisualisation;
 import java.awt.SystemTray;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.Serializable;
 
 /**
  * Close the window correctly (system tray menu included)
  */
-public class WindowCloser implements WindowListener {
+public class WindowCloser implements WindowListener, Serializable {
     private VisualisationJFrame main_frame;
 
     /**

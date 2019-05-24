@@ -1,11 +1,13 @@
 package graphsVisualisation;
 
+import java.io.Serializable;
+
 import javax.swing.JLabel;
 
 /**
  * To make a fade-in apparition for the element "title_label" in the VisualisationJFrame class.
  */
-public class TitleLabelApparitionEffect extends Thread {
+public class TitleLabelApparitionEffect extends Thread implements Serializable{
     // Elements of the interface
     private VisualisationJFrame main_frame;
     private JLabel title_label;

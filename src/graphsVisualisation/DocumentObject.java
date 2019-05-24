@@ -1,15 +1,22 @@
 package graphsVisualisation;
 
+import java.io.Serializable;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 
-public class Document {
+public class DocumentObject implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String name;
-	private Path filepath;
+	private String filepath;
 	private List<Concept> cpt;
 
-	public Document (String name, Path filepath, List< Concept> cpt) {
+	public DocumentObject (String name, String filepath, List< Concept> cpt) {
 		this.name = name;
 		this.filepath = filepath;
 		this.cpt = cpt;
@@ -24,10 +31,10 @@ public class Document {
 	}
 
 	public Path getFilepath() {
-		return filepath;
+		return Paths.get(filepath);
 	}
 
-	public void setFilepath(Path filepath) {
+	public void setFilepath(String filepath) {
 		this.filepath = filepath;
 	}
 

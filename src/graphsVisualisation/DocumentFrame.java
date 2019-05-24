@@ -7,9 +7,10 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
@@ -26,9 +27,13 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 //TODO DOCS
-public class DocumentFrame extends JFrame {
-	private static final long serialVersionUID = 6155703812504294146L;
+public class DocumentFrame extends JFrame implements Serializable {
 
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//Constants for the frame
 	private final short WIDTH = 400;
 	private final short HEIGHT = 600;
@@ -128,7 +133,13 @@ public class DocumentFrame extends JFrame {
 	private HashMap<String, Terme> term;
 	private HashMap<String, ArrayList<String>> cpt_term;
 	private File chosen_file;
-	private HashMap<String, List<Concept>> listDoc;
+	private ArrayList<DocumentObject> listDoc;
+	
+	private File file_doc_concept;
+	private File file_concept;
+	
+	private DocumentFrame document_frame;
+	private HashMap<Concept, ArrayList<DocumentObject>> cptDocs;
 	
 	/**
 	 * Main constructor
@@ -137,8 +148,13 @@ public class DocumentFrame extends JFrame {
 	public DocumentFrame(UploadJFrame upload_frame, HashMap<String, Concept> cpt, HashMap<String, Terme> term, HashMap<String, ArrayList<String>> cpt_term, File chosen_file) {
 		//Initialization
 		this.upload_frame = upload_frame;
+		this.file_doc_concept = new File("./ressources/dico_doc.txt");
+		this.file_concept = new File("./ressources/concept_doc.txt");
+
+		this.document_frame = this;
 		
-		this.listDoc = new HashMap<String, List<Concept>>();
+		ArrayList<DocumentObject> document_list = Sauvegarde.read(file_doc_concept);
+		this.listDoc = document_list == null ? new ArrayList<DocumentObject>() : document_list;
 		// Concepts and Terms
 		this.cpt = cpt;
 		this.term = term;
@@ -241,8 +257,27 @@ public class DocumentFrame extends JFrame {
 		submit_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Document d1 = new Document(document_input_name.getText(), chosen_file.toPath(), concepts_list.getSelectedValuesList());
-				listDoc.put(d1.getName(),d1.getCpt());
+				DocumentObject d1 = new DocumentObject(document_input_name.getText(), chosen_file.toPath().toString(), concepts_list.getSelectedValuesList());
+				
+				for (Entry<String, Concept> c : cpt.entrySet()) {
+					if (d1.getCpt().contains(c.getValue())) {
+						//c.getValue().toStringComplet();
+						c.getValue().getListe_doc().add(d1);
+						//System.out.println(c.getValue().getListe_doc());
+					}
+					
+				}
+				
+				listDoc.add(d1);
+				Sauvegarde.write(listDoc, file_doc_concept);
+				Sauvegarde.writeMap(cpt, file_concept);
+				cpt = Sauvegarde.readMap(file_concept);
+				document_frame.dispose();
+
+				
+			
+
+				
 
 			}
 			

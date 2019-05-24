@@ -1,6 +1,13 @@
 package graphsVisualisation;
 
-public class Difference {
+import java.io.Serializable;
+
+public class Difference implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	//Attributs
 	private String name;
 	private String internationalName;
