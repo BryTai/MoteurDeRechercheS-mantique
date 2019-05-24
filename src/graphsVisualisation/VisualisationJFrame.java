@@ -17,12 +17,13 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -123,11 +124,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 
 	// JList
 	private JList<String> term_list;
-	private JList<String> documents_list;
+	private JList<DocumentObject> documents_list;
 
 	// DefaultListModel
 	private DefaultListModel<String> term_list_model;
-	private DefaultListModel<String> documents_list_model;
+	private DefaultListModel<DocumentObject> documents_list_model;
 
 	// Dimensions
 	private Dimension search_panel_dimension;
@@ -176,7 +177,9 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private WindowCloser main_window_closer;
 	private TitleLabelApparitionEffect title_label_effect;
 	private OptionsManager options_manager;
-	private FileRenderer file_renderer;
+	private DocumentRenderer doc_renderer;
+	
+	private DocumentObject selected_doc;
 	
 	// Constants for the names of the menus
 	private final String MENU_FILE_NAME = "Fichier";
@@ -390,8 +393,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 
 		this.documents_panel = new JPanel();
 		this.documents_label = new JLabel(DOCUMENTS_LABEL_NAME);
-		this.documents_list_model = new DefaultListModel<String>();
-		this.documents_list = new JList<String>(documents_list_model);
+		this.documents_list_model = new DefaultListModel<DocumentObject>();
+		this.documents_list = new JList<DocumentObject>(documents_list_model);
 		this.documents_view = new JScrollPane(documents_list);
 
 		// Initialize layouts
@@ -421,7 +424,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		this.main_window_closer = new WindowCloser(main_frame); // To manage the closing of the jframe
 		this.title_label_effect = new TitleLabelApparitionEffect(main_frame); // To manage the apparition of the title																		// label
 		this.options_manager = new OptionsManager(main_frame);
-		//this.file_renderer = new FileRenderer();
+		this.doc_renderer = new DocumentRenderer();
 		
 		// Settings of the title panel and their sub-elements
 		title_label.setFont(title_font);
@@ -457,7 +460,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		documents_panel.setPreferredSize(documents_panel_dimension);
 		
 		documents_list.setFont(list_elements_font);
-		documents_list.setCellRenderer(file_renderer);
+		documents_list.setCellRenderer(doc_renderer);
 		documents_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// Settings of the labels in results panel
@@ -601,16 +604,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private void addDocuments(String conceptID) {
 		documents_list_model.clear();
         ArrayList<DocumentObject> lesDocs = cpt.get(conceptID).getListe_doc();       
-        String doc_to_add;
         
-        
-        for (int i = 0 ; i < lesDocs.size();i++) { 
-        		
-            	doc_to_add = lesDocs.get(i).getName();
-
-            	//doc_to_add =capitalize(doc_to_add);
-				this.documents_list_model.addElement(doc_to_add);
-				documents_list.updateUI();
+        for (int i = 0 ; i < lesDocs.size(); i++) { 
+        	selected_doc = lesDocs.get(i);  	
+            this.documents_list_model.addElement(selected_doc);
+			documents_list.updateUI();
         }
 	}
 
@@ -720,19 +718,21 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 				if(evt.getClickCount() == 2) {
 					//Get the selected element if the user double left-clicked
 					@SuppressWarnings("unchecked")
-					JList<String> list = (JList<String>) evt.getSource();
+					JList<DocumentObject> list = (JList<DocumentObject>) evt.getSource();
 					int index = list.locationToIndex(evt.getPoint());
-					String selected_doc = list.getModel().getElementAt(index);
-					for (int i = 0; i<cpt.get(conceptId).getListe_doc().size(); i++) {
-						if (cpt.get(conceptId).getListe_doc().get(i).getName().equals(selected_doc)) {
-							try {
-								Desktop.getDesktop().open(new File(cpt.get(conceptId).getListe_doc().get(i).getFilepath().toString()));
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-							}
+					DocumentObject selected_doc = list.getModel().getElementAt(index);
+										
+					ArrayList<DocumentObject> documents_of_concept = cpt.get(conceptId).getListe_doc();
+					
+					for (int i = 0; i<documents_of_concept.size(); i++) {
+						try {
+							String path_to_open = documents_of_concept.get(i).getFilepath().toString();
+							File file_to_open = new File(path_to_open);
+							Desktop.getDesktop().open(file_to_open);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
-
 				}
 			}
 		});

@@ -6,8 +6,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@SuppressWarnings("unused")
 public class GraphsMain implements Serializable{
+	private static final long serialVersionUID = 6810747824461674577L;
+
 	/**
 	 * The entry point of the program
 	 * @param args: Arguments of the main method
