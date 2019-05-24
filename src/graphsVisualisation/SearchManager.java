@@ -36,7 +36,7 @@ public class SearchManager implements ActionListener, Serializable {
 		search_bar_content = main_frame.getSearchBarText();
 
 		try {
-			Indexation.searchIndex(search_bar_content);
+			Indexation.searchIndex(search_bar_content,main_frame.getCpt(),main_frame.getTerm(),main_frame.getCpt_term());
 
 		} catch (Exception e) {
 

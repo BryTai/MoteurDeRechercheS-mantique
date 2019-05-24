@@ -123,11 +123,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 
 	// JList
 	private JList<String> term_list;
-	private JList<File> documents_list;
+	private JList<String> documents_list;
 
 	// DefaultListModel
 	private DefaultListModel<String> term_list_model;
-	private DefaultListModel<File> documents_list_model;
+	private DefaultListModel<String> documents_list_model;
 
 	// Dimensions
 	private Dimension search_panel_dimension;
@@ -292,6 +292,32 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	private HashMap<String, Terme> term;
 	private HashMap<String, ArrayList<String>> cpt_term;
 	
+	public HashMap<String, Concept> getCpt() {
+		return cpt;
+	}
+
+	public void setCpt(HashMap<String, Concept> cpt) {
+		this.cpt = cpt;
+	}
+
+	public HashMap<String, Terme> getTerm() {
+		return term;
+	}
+
+	public void setTerm(HashMap<String, Terme> term) {
+		this.term = term;
+	}
+
+	public HashMap<String, ArrayList<String>> getCpt_term() {
+		return cpt_term;
+	}
+
+	public void setCpt_term(HashMap<String, ArrayList<String>> cpt_term) {
+		this.cpt_term = cpt_term;
+	}
+
+	private String conceptId;
+	
 	/**
 	 * Main constructor of this class. This constructor creates all the interface.
 	 */
@@ -364,9 +390,8 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 
 		this.documents_panel = new JPanel();
 		this.documents_label = new JLabel(DOCUMENTS_LABEL_NAME);
-		this.documents_list_model = new DefaultListModel<File>();
-		this.addDocuments();
-		this.documents_list = new JList<File>(documents_list_model);
+		this.documents_list_model = new DefaultListModel<String>();
+		this.documents_list = new JList<String>(documents_list_model);
 		this.documents_view = new JScrollPane(documents_list);
 
 		// Initialize layouts
@@ -396,7 +421,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		this.main_window_closer = new WindowCloser(main_frame); // To manage the closing of the jframe
 		this.title_label_effect = new TitleLabelApparitionEffect(main_frame); // To manage the apparition of the title																		// label
 		this.options_manager = new OptionsManager(main_frame);
-		this.file_renderer = new FileRenderer();
+		//this.file_renderer = new FileRenderer();
 		
 		// Settings of the title panel and their sub-elements
 		title_label.setFont(title_font);
@@ -527,13 +552,11 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
         String term_to_add;
         
         for (int i = 0 ; i < lesTermes.size();i++) {
-        	if(term.get(lesTermes.get(i)).getLangue().equals("fr")) {
 	            if (!term_list_model.contains(term.get(lesTermes.get(i)).getName())) {
 	            	term_to_add = term.get(lesTermes.get(i)).getName();
 	            	term_to_add = "- " + capitalize(term_to_add);
 					this.term_list_model.addElement(term_to_add);
 	            }
-        	}
         }
 
 		this.term_list_model = orderListModel(term_list_model);
@@ -557,8 +580,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		}
 		
 		return list_model;
-	}
-	
+	}	
 
 	/**
 	 * Put the first letter of the string in uppercase
@@ -576,19 +598,20 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 	/**
 	 * To add all the documents linked to a term in the list of terms
 	 */
-	private void addDocuments() {
-		File documents_folder = new File(INDEXED_FILE_PATH_NAME);
-		
-		//Creates the folder where the documents are located if it doesn't exists
-		if(!documents_folder.exists()) {
-			documents_folder.mkdir();
-		}
-		
-		//Adding all the documents to the model
-		File[] documents_list = documents_folder.listFiles();
-		for (int i = 0; i < documents_list.length; i++) {
-			documents_list_model.addElement(documents_list[i]);
-		}
+	private void addDocuments(String conceptID) {
+		documents_list_model.clear();
+        ArrayList<DocumentObject> lesDocs = cpt.get(conceptID).getListe_doc();       
+        String doc_to_add;
+        
+        
+        for (int i = 0 ; i < lesDocs.size();i++) { 
+        		
+            	doc_to_add = lesDocs.get(i).getName();
+
+            	//doc_to_add =capitalize(doc_to_add);
+				this.documents_list_model.addElement(doc_to_add);
+				documents_list.updateUI();
+        }
 	}
 
 	/**
@@ -619,7 +642,7 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
-					System.out.println(documents_list.getSelectedValue().toString());
+					System.out.println(documents_list.getSelectedValue());
 				}
 			}
 		});
@@ -669,10 +692,13 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		concepts_tree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent arg0) {
+
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) concepts_tree.getLastSelectedPathComponent();
 				if (node != null && !node.equals(root_node)) {
 					Concept cpt = (Concept) node.getUserObject();
-					addTerms(cpt.getId());
+					main_frame.conceptId =  cpt.getId();
+					addTerms(conceptId);
+					addDocuments(conceptId);
 				}
 			}
 		});
@@ -690,19 +716,23 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 		//Adding a listener to open the selected document with a double left click
 		documents_list.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent evt) {	
+
 				if(evt.getClickCount() == 2) {
 					//Get the selected element if the user double left-clicked
 					@SuppressWarnings("unchecked")
-					JList<File> list = (JList<File>) evt.getSource();
+					JList<String> list = (JList<String>) evt.getSource();
 					int index = list.locationToIndex(evt.getPoint());
-					File selected_file = list.getModel().getElementAt(index);
-					
-					//Opening the selected with the default application
-					try {
-						Desktop.getDesktop().open(selected_file);
-					} catch (IOException e) {
-						e.printStackTrace();
+					String selected_doc = list.getModel().getElementAt(index);
+					for (int i = 0; i<cpt.get(conceptId).getListe_doc().size(); i++) {
+						if (cpt.get(conceptId).getListe_doc().get(i).getName().equals(selected_doc)) {
+							try {
+								Desktop.getDesktop().open(new File(cpt.get(conceptId).getListe_doc().get(i).getFilepath().toString()));
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							}
 					}
+
 				}
 			}
 		});

@@ -6,8 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.Serializable;
-import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.*;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -30,22 +30,20 @@ import org.apache.pdfbox.text.PDFTextStripper;
 
 
 @SuppressWarnings("deprecation")
-public class Indexation implements Serializable{
+public class Indexation {
 	private static final String FILES_TO_INDEX_DIRECTORY = "ressources/fileToIndex";
     private static final String INDEX_DIRECTORY = "ressources/indexDirectory";
     private static final String FIELD_PATH = "path";
     private static final String FIELD_CONTENTS = "contents";
 
-
+  //************************************************************************************************************************************************************
     public static void createIndex() throws CorruptIndexException, LockObtainFailedException,IOException{
-
-    	Analyzer analyzer = new StandardAnalyzer();
-    	boolean recreatedIndexIfExists = true;
-    	IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
-    	File dir = new File(FILES_TO_INDEX_DIRECTORY);
-    	File[] files = dir.listFiles();
-    	if (files != null) {
-
+        Analyzer analyzer = new StandardAnalyzer();
+        boolean recreatedIndexIfExists = true;
+        IndexWriter indexWriter = new IndexWriter(INDEX_DIRECTORY, analyzer, recreatedIndexIfExists);
+        File dir = new File(FILES_TO_INDEX_DIRECTORY);
+        File[] files = dir.listFiles();
+        if (files != null) {
             for(File file : files){
                 Document document = new Document();
                 String path = file.getCanonicalPath();
@@ -57,41 +55,289 @@ public class Indexation implements Serializable{
         }
         indexWriter.optimize();
         indexWriter.close();
+    }
+  //************************************************************************************************************************************************************
+    @SuppressWarnings("unchecked")
+    public static void searchIndex(String searchString, HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term) throws IOException, ParseException{
+        System.out.println("Rechercher : '" + searchString + "'");
+        Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY); 
+        IndexReader indexReader = IndexReader.open(directory);
+        IndexSearcher indexSearcher= new IndexSearcher(indexReader);
+        ArrayList<ArrayList<String>> list_research = Indexation.researchOnto(searchString,cpt,trm,cpt_term);
+        String finalQuery = "";
+        Analyzer analyzer = new StandardAnalyzer();
+        QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
+        
+        
+        System.out.println("La final");
+        System.out.println(list_research.toString());
+        ArrayList<String> research_purged = new ArrayList<String>();
+        for(int i = 0 ; i < list_research.size() ; i++) {
+        	for(int j = 0 ; j < list_research.get(i).size() ; j++) {
+        		if(!research_purged.contains(list_research.get(i).get(j))) {
+        			research_purged.add(list_research.get(i).get(j));
+        		}
+        	}
+        }
+        for(int i = 0 ; i < research_purged.size() ; i++) {
+        	finalQuery = finalQuery +  research_purged.get(i) + " ";
+        }
+        System.out.println("finaquery");
+        System.out.println(finalQuery);
+        Query query;
+        if(!finalQuery.equals("")) {
+        	query = queryParser.parse(finalQuery);
+        }else {
+        	query = queryParser.parse(searchString);
+        }
+        
+        Hits hits = indexSearcher.search(query);
+        Iterator<Hit> it = hits.iterator();
+        while(it.hasNext()){
+        	Hit hit = it.next();
+        	Document document = hit.getDocument();
+        	String path = document.get(FIELD_PATH);
+            System.out.println("Hit : " + path);
+            } 
+       
+        
+    }
+    //************************************************************************************************************************************************************
+    /*
+     * 
+     * This method find the key of a concept
+     * @param the concept you are looking for the key
+     * @param the list of the concepts
+     * @return the key
+     */
+    
+    public static String conceptKey(String research,HashMap<String, Concept> cpt ) {
+    	for(Entry<String,Concept> lesCpts : cpt.entrySet()) {
+			//La recherche globale est un concept
+			if (lesCpts.getValue().getName().compareToIgnoreCase(research) == 0) {
+				return lesCpts.getKey();
+				
+			}
+    	}
+    	return null;
+    }
+    //************************************************************************************************************************************************************
+    /*
+     * This method find the key of a term
+     * @param the term you are looking for the key
+     * @param the list of the terms
+     * @return the key of the term
+     */
+    
+    public static String termKey(String research,HashMap<String,Terme> trm) {
+    	for(Entry<String, Terme> lesTermes : trm.entrySet()) {
+			if (lesTermes.getValue().getName().compareToIgnoreCase(research) == 0) {
+				return lesTermes.getKey();			
+			}
+    	}
+    	return null;
+    }
+    //************************************************************************************************************************************************************
+   
+    /*  
+     * This method find the strings corresponding to an "et"
+     * @param the array of the research split with " et "
+     *  
+     */
+    public static ArrayList<String>conjonction(String[] split, HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term){
+		
+    	for(int i = 0 ; i < split.length ; i++) {
+    		
+    	}
+    	
+    	return null;
+    	
+    }
+    //************************************************************************************************************************************************************
+    /*
+     * 
+     * This method give the intersection of two list
+     * @param the first list
+     * @param the second list
+     * @return the new list corresponding to the intersection of the two list
+     * 
+     * 
+     */
+    
+   
+	public static  ArrayList<ArrayList<String>> intersection(ArrayList<ArrayList<String>> l1,ArrayList<ArrayList<String>> l2){
+    	l1.addAll(l2);
+		return l1;
+    }
+    
+    //************************************************************************************************************************************************************
+    /*
+     * @param the item you are searching for
+     * @param the map of the concept
+     * @param the map of the terms
+     * @param the map of the concept with their terms
+     * @return the list of the element found with the ontoterminology
+     */
+    public static  ArrayList<String> searchConcept(String key,HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term) {
+    	ArrayList<String> liste = new ArrayList();
 
-   }
+    	liste.add(cpt.get(key).getName());
 
-   @SuppressWarnings("unchecked")
-public static void searchIndex(String searchString) throws IOException, ParseException{
-       if(!searchString.equals("")) {
-    	   System.out.println("Rechercher : '" + searchString + "'");
-           Directory directory = FSDirectory.getDirectory(INDEX_DIRECTORY);
-           IndexReader indexReader = IndexReader.open(directory);
-           IndexSearcher indexSearcher= new IndexSearcher(indexReader);
+    	//On recherche parmis les isa du cpt s'il y en a
+    	if(cpt.get(key).getIsa().length != 0  ) {
+    		for(String termes : cpt_term.get(key)) {
+    			if( !liste.contains(trm.get(termes).getName())) {
+    				liste.add(0,trm.get(termes).getName());
+    			}
+    			
+    			
+    		}
+    		for(String isa : cpt.get(key).getIsa()) {
+    			searchConcept(isa,cpt,trm,cpt_term);
+    		}
+    	}else {
+    		return liste;
+    	}
+		
+		
+    	
+    	
+		return liste;
+    	
+    }
+    
+    //************************************************************************************************************************************************************
+    /*
+     * @param the item you are looking for 
+     * @param the map of the concept
+     * @param the map of the terms
+     * @param the map of the concept with their terms
+     * @return the list of all the element corresponding thanks to the ontoterminology
+     * 
+     */
+    
+    public static  ArrayList<String> searchTerm(String research,HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term){
+    	ArrayList<String> liste = new ArrayList<String>();
+    
+    	for( String c : trm.get(research).getConcepts()) {
+    		liste.addAll(searchConcept(c,cpt,trm,cpt_term));
+    	}
+    	
+    	return liste;
 
-           Analyzer analyzer = new StandardAnalyzer();
-           QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
-           Query query = queryParser.parse(searchString);
-           Hits hits = indexSearcher.search(query);
-           System.out.println("Number of hits: " + hits.length());
-           Iterator<Hit> it = hits.iterator();
-           while(it.hasNext()){
-               Hit hit = it.next();
-               Document document = hit.getDocument();
-               String path = document.get(FIELD_PATH);
-               System.out.println("Hit : " + path);
-           }
-       }
-   }
+    }
+    
+    //************************************************************************************************************************************************************
+    /*
+     * 
+     * Research in the ontoterminology
+     * @param research
+     * @param cpt
+     * @param trm
+     * @param cpt_term
+     * @return List of the list with the new term and concept
+     */
+    public static  ArrayList<ArrayList<String>> researchOnto(String research,HashMap<String, Concept> cpt,HashMap<String, Terme> trm,HashMap<String, ArrayList<String>> cpt_term) {
+    	String[] res = research.split(" ");
+    	String[] et  = research.split(" et ");
+    	String[] ou  = research.split(" ou ");
+    	
+    	//La liste contenant les termes et les concepts de la recherche   	
+		ArrayList<ArrayList<String>> liste_recherche = new ArrayList<ArrayList<String>>();
+		//Recherche parmis les concepts
+		String keyCResearch = Indexation.conceptKey(research, cpt);
+		
+		//La recherche globale est un concept
+		if(!(keyCResearch== null)) {
+			if(!cpt_term.get(keyCResearch).isEmpty()) {
+				ArrayList<String> liste_terme = new ArrayList<String>(cpt_term.get(keyCResearch));
+				for(int k = 0 ; k < liste_terme.size() ; k++) {
+					liste_terme.set(k, trm.get(liste_terme.get(k)).getName());
+							
+					}
+					if(!liste_recherche.contains(liste_terme)) {
+						liste_recherche.add(0,liste_terme);
+					}
+						
+				} 
+			//on recherche dans la recherche split 
+			for (int i  = 0 ; i < res.length ; i ++) {
+				String keyCSplit = Indexation.conceptKey(res[i], cpt);
+	    		if(!liste_recherche.contains(Indexation.searchConcept(keyCSplit,cpt,trm, cpt_term))) {
+	    				liste_recherche.add(0,Indexation.searchConcept(keyCSplit,cpt,trm, cpt_term));
+	    		}
+	    				
+	    	}
+		}
 
-   public static void pdfToText(String docName){
+		//On recherche dans les termes
+		String keyTResearch = Indexation.termKey(research, trm);
+		//for(Entry<String, Terme> lesTermes : trm.entrySet()) {
+		if(!(keyTResearch == null)) {
+			ArrayList<String> liste_termes;
+			for( String c : trm.get(keyTResearch).getConcepts() ){
+				liste_termes = new ArrayList<String>(cpt_term.get(c));
+				for(int k = 0; k < liste_termes.size(); k++) {
+					liste_termes.set(k, trm.get(liste_termes.get(k)).getName());
+				}
+				if(!liste_recherche.contains(liste_termes)) {
+					liste_recherche.add(0,liste_termes);
+				}
+					
+				if(!liste_recherche.contains(searchConcept(c,cpt,trm,cpt_term))) {
+					liste_recherche.add(0,searchConcept(c,cpt,trm,cpt_term));
+				}
+					
+			}
+				
+			//On regarde la recherche split
+			for (int i  = 0 ; i < res.length ; i ++) {
+				String keyTSplit = Indexation.termKey(res[i], trm);
+    			if(!liste_recherche.contains(Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term))) {
+    				liste_recherche.add(0,Indexation.searchTerm(keyTSplit,cpt,trm, cpt_term));
+    			}
+    				
+    		}
+		}
+		
+		
+		//Conjonction de terme / concept
+		if(et.length >= 1 ) {
+			for(int j = 0 ; j < et.length - 1 ; j++) {
+				ArrayList<ArrayList<String>>intersec = Indexation.intersection(Indexation.researchOnto(et[j],cpt,trm,cpt_term),Indexation.researchOnto(et[j+1],cpt,trm,cpt_term));
+				System.out.println("HELLOc" + intersec.toString());
+				if(!liste_recherche.contains(intersec)) {
+					liste_recherche.addAll(intersec);
+				}
 
+			
+			}	
+		}
+		//Disjonction de terme / concept
+		if(ou.length >= 1 ) {
+			for(int j = 0 ; j < ou.length - 1 ; j ++) {
+				if(!liste_recherche.contains(Indexation.researchOnto(ou[j], cpt, trm, cpt_term))) {
+					liste_recherche.addAll(j,Indexation.researchOnto(ou[j], cpt, trm, cpt_term));
+				}
+				
+			}
+		}
+		
+    		
+    	System.out.println("ICI-------------------------");
+    	System.out.println(liste_recherche.toString());
+    	return liste_recherche;
+    }
+    
+    //************************************************************************************************************************************************************
+    public static void pdfToText(String docName){
         File f = new File(FILES_TO_INDEX_DIRECTORY+ "/" + docName+".txt");
         if (f.exists()){
             System.out.println("Le fichier existe déjà!!!");
         }
         try{
             //extract text using library
-            PDDocument doc = PDDocument.load(new File(FILES_TO_INDEX_DIRECTORY+ "/"+ docName ));
+            PDDocument doc = PDDocument.load(new File(FILES_TO_INDEX_DIRECTORY+ "/"+ docName + ".pdf"));
             String text = new PDFTextStripper().getText(doc);
 
             //write the content to text file

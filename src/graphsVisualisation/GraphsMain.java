@@ -31,7 +31,7 @@ public class GraphsMain implements Serializable{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
+		} else { 
 			cpt = Sauvegarde.readMap(filename);
 		}
 		HashMap<String, Terme> term = parser.lesTermes(cpt);
