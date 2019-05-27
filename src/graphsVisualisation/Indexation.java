@@ -85,6 +85,7 @@ public class Indexation {
         for(int i = 0 ; i < research_purged.size() ; i++) {
         	finalQuery = finalQuery +  research_purged.get(i) + " ";
         }
+        System.out.println(finalQuery);
         for(int i = 0 ; i < list_key.size() ; i++) {
         	Concept cptEnCours = cpt.get(list_key.get(i));
         	ArrayList<DocumentObject> list_doc_en_cours = new ArrayList<DocumentObject>(cptEnCours.getListe_doc());
@@ -97,7 +98,7 @@ public class Indexation {
         		
         }
 
-        
+        System.out.println(list_doc.toString());
         Query query;
         if(!finalQuery.equals("")) {
         	query = queryParser.parse(finalQuery);
@@ -107,20 +108,24 @@ public class Indexation {
         
         Hits hits = indexSearcher.search(query);
         Iterator<Hit> it = hits.iterator();
-        while(it.hasNext()){
+       if(list_doc.isEmpty()) { 
+    	   while(it.hasNext()){
         	Hit hit = it.next();
         	Document document = hit.getDocument();
         	String path = document.get(FIELD_PATH);
-        	if(!list_doc.isEmpty()) {
-        		for(int i = 0 ; i < list_doc.size() ; i++) {
-            		String path_en_cours = list_doc.get(i).getFilepath().toAbsolutePath().toString();
-            		String path_ok =  list_doc.get(i).getFilepath().toString();
-            		if(!path_en_cours.equals(path)) {
-            			DocumentObject newDoc = new DocumentObject(path_ok);
-            			list_doc.add(newDoc);
-            		}
-        		}
-        	}else{
+
+//        		for(int i = 0 ; i < list_doc.size() ; i++) {
+//            		String path_en_cours = list_doc.get(i).getFilepath().toString();
+//            		String path_ok =  list_doc.get(i).getFilepath().toString();
+//            		System.out.println(path);
+//            		System.out.println(path_en_cours);
+//            		if(!path_en_cours.equals(path)) {
+//            			DocumentObject newDoc = new DocumentObject(path_ok);
+//            			list_doc.add(newDoc);
+//            			System.out.println(list_doc.size());
+//            		}
+//        		}
+//        	}else{
         		
         		//String[] name = path.split(".*\\");
         		DocumentObject newDoc = new DocumentObject(path,path);
@@ -129,7 +134,7 @@ public class Indexation {
         	}
         }
             
-
+        System.out.println(list_doc.toString());
         return list_doc;
        
         

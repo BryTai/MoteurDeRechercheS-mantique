@@ -723,12 +723,12 @@ public class VisualisationJFrame extends JFrame implements ActionListener, Seria
 					DocumentObject selected_doc = list.getModel().getElementAt(index);
 										
 					ArrayList<DocumentObject> documents_of_concept = cpt.get(conceptId).getListe_doc();
-					
-					for (int i = 0; i<documents_of_concept.size(); i++) {
+					file_to_open = new File(selected_doc.getFilepath().toString());
+//					for (int i = 0; i<documents_of_concept.size(); i++) {
 
-							String path_to_open = documents_of_concept.get(i).getFilepath().toString();
-							file_to_open = new File(path_to_open);
-					}
+//							String path_to_open = documents_of_concept.get(i).getFilepath().toString();
+//							file_to_open = new File(path_to_open);
+//					}
 						try {
 							if (file_to_open != null) {
 							Desktop.getDesktop().open(file_to_open);

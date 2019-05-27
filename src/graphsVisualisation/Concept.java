@@ -2,6 +2,7 @@ package graphsVisualisation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 //Classe repr�sentant les concepts des ontoterminologies
 public class Concept implements Serializable {
 	
